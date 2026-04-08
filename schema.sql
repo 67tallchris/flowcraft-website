@@ -4,8 +4,12 @@ CREATE TABLE IF NOT EXISTS waitlist_emails (
     email TEXT UNIQUE NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     source TEXT DEFAULT 'website',
-    notes TEXT
+    notes TEXT,
+    utm_data TEXT
 );
+
+-- Add utm_data column if table already exists (migration)
+ALTER TABLE waitlist_emails ADD COLUMN utm_data TEXT;
 
 -- Export logs table
 CREATE TABLE IF NOT EXISTS export_logs (

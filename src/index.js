@@ -80,9 +80,10 @@ async function initDB(DB) {
         email TEXT UNIQUE NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         source TEXT DEFAULT 'website',
-        notes TEXT
+        notes TEXT,
+        utm_data TEXT
       );
-      
+
       CREATE TABLE IF NOT EXISTS export_logs (
         id TEXT PRIMARY KEY,
         exported_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -123,7 +124,7 @@ function generateId() {
 async function handleWaitlistSignup(request, env) {
   try {
     const body = await request.json();
-    const { email } = body;
+    const { email, utm } = body;
 
     if (!email || !email.includes('@')) {
       return new Response(JSON.stringify({ error: 'Valid email required' }), {
@@ -133,9 +134,11 @@ async function handleWaitlistSignup(request, env) {
     }
 
     const id = generateId();
+    const utmData = utm ? JSON.stringify(utm) : null;
+    
     await env.DB.prepare(
-      'INSERT INTO waitlist_emails (id, email) VALUES (?, ?)'
-    ).bind(id, email.toLowerCase()).run();
+      'INSERT INTO waitlist_emails (id, email, utm_data) VALUES (?, ?, ?)'
+    ).bind(id, email.toLowerCase(), utmData).run();
 
     return new Response(JSON.stringify({ success: true, message: 'Joined waitlist!' }), {
       headers: { 'content-type': 'application/json' },
@@ -160,6 +163,7 @@ async function handleGetWaitlist(request, env) {
   const page = parseInt(url.searchParams.get('page') || '1');
   const limit = parseInt(url.searchParams.get('limit') || '50');
   const tag = url.searchParams.get('tag');
+  const utmSource = url.searchParams.get('utmSource');
   const dateFrom = url.searchParams.get('dateFrom');
   const dateTo = url.searchParams.get('dateTo');
   const search = url.searchParams.get('search');
@@ -181,6 +185,13 @@ async function handleGetWaitlist(request, env) {
     countQuery += ` AND e.id IN (SELECT et.email_id FROM email_tags et JOIN tags t ON et.tag_id = t.id WHERE t.name = ?)`;
     params.push(tag);
     countParams.push(tag);
+  }
+
+  if (utmSource) {
+    query += ` AND e.utm_data LIKE ?`;
+    countQuery += ` AND e.utm_data LIKE ?`;
+    params.push(`%"utm_source":"${utmSource}"%`);
+    countParams.push(`%"utm_source":"${utmSource}"%`);
   }
 
   if (dateFrom) {
@@ -219,12 +230,25 @@ async function handleGetWaitlist(request, env) {
     })) : []
   }));
 
+  // Extract unique UTM sources for dropdown
+  const utmSources = [...new Set(results
+    .filter(e => e.utm_data)
+    .map(e => {
+      try {
+        const utm = JSON.parse(e.utm_data);
+        return utm.utm_source;
+      } catch { return null; }
+    })
+    .filter(Boolean)
+  )];
+
   return new Response(JSON.stringify({
     emails,
     total: countResults.total,
     page,
     limit,
-    totalPages: Math.ceil(countResults.total / limit)
+    totalPages: Math.ceil(countResults.total / limit),
+    utmSources
   }), {
     headers: { 'content-type': 'application/json' },
   });
@@ -1018,22 +1042,40 @@ function getWebsiteHTML() {
 
             const form = document.getElementById('waitlist-form');
             const messageEl = document.getElementById('waitlist-message');
-            
+
+            // Capture UTM parameters from URL
+            function getUTMParams() {
+                const params = new URLSearchParams(window.location.search);
+                const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+                const utm = {};
+                utmKeys.forEach(key => {
+                    if (params.has(key)) {
+                        utm[key] = params.get(key);
+                    }
+                });
+                // Capture video variant if present
+                if (params.has('video')) {
+                    utm.video = params.get('video');
+                }
+                return Object.keys(utm).length > 0 ? utm : null;
+            }
+
             if (form) {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const email = document.getElementById('waitlist-email').value;
+                    const utm = getUTMParams();
                     messageEl.textContent = 'Submitting...';
                     messageEl.className = '';
-                    
+
                     try {
                         const res = await fetch('/api/waitlist', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email })
+                            body: JSON.stringify({ email, utm })
                         });
                         const data = await res.json();
-                        
+
                         if (res.ok) {
                             messageEl.textContent = '🎉 Thanks for joining! We\'ll be in touch soon.';
                             messageEl.className = 'success';
@@ -1383,6 +1425,9 @@ function getAdminHTML() {
                         <select id="filter-tag">
                             <option value="">All Tags</option>
                         </select>
+                        <select id="filter-utm-source">
+                            <option value="">All Sources</option>
+                        </select>
                         <input type="date" id="filter-date-from" placeholder="From">
                         <input type="date" id="filter-date-to" placeholder="To">
                         <button class="btn btn-secondary" onclick="loadEmails()">Filter</button>
@@ -1411,6 +1456,7 @@ function getAdminHTML() {
                                     <th style="width: 40px;"><input type="checkbox" class="checkbox" id="select-all" onchange="toggleSelectAll()"></th>
                                     <th>Email</th>
                                     <th>Tags</th>
+                                    <th>Source / UTM</th>
                                     <th>Signup Date</th>
                                     <th>Actions</th>
                                 </tr>
@@ -1597,12 +1643,14 @@ function getAdminHTML() {
         async function loadEmails() {
             const search = document.getElementById('filter-search').value;
             const tag = document.getElementById('filter-tag').value;
+            const utmSource = document.getElementById('filter-utm-source').value;
             const dateFrom = document.getElementById('filter-date-from').value;
             const dateTo = document.getElementById('filter-date-to').value;
             
             let url = \`/api/waitlist?page=\${currentPage}&limit=50\`;
             if (search) url += \`&search=\${search}\`;
             if (tag) url += \`&tag=\${tag}\`;
+            if (utmSource) url += \`&utmSource=\${utmSource}\`;
             if (dateFrom) url += \`&dateFrom=\${dateFrom}\`;
             if (dateTo) url += \`&dateTo=\${dateTo}\`;
             
@@ -1610,7 +1658,14 @@ function getAdminHTML() {
             const data = await res.json();
             
             const tbody = document.getElementById('emails-table-body');
-            tbody.innerHTML = data.emails.map(email => \`
+            tbody.innerHTML = data.emails.map(email => {
+                const utm = email.utm_data ? JSON.parse(email.utm_data) : {};
+                const utmBadges = [];
+                if (utm.utm_source) utmBadges.push(`<span class="tag" style="background: #38A169;">${utm.utm_source}</span>`);
+                if (utm.utm_campaign) utmBadges.push(`<span class="tag" style="background: #805AD5;">${utm.utm_campaign}</span>`);
+                if (utm.video) utmBadges.push(`<span class="tag" style="background: #D69E2E;">Video ${utm.video}</span>`);
+                
+                return \`
                 <tr class="\${selectedEmails.has(email.id) ? 'selected' : ''}">
                     <td><input type="checkbox" class="checkbox" \${selectedEmails.has(email.id) ? 'checked' : ''} onchange="toggleEmail('\${email.id}')"></td>
                     <td>\${email.email}</td>
@@ -1618,14 +1673,25 @@ function getAdminHTML() {
                         \${email.tags.map(t => \`<span class="tag" style="background: \${t.color}">\${t.name}<span class="tag-remove" onclick="removeTag('\${email.id}', '\${t.name}')">&times;</span></span>\`).join(' ')}
                         <button class="btn btn-sm btn-outline" onclick="openTagModal('\${email.id}')" style="margin-left: 4px;">+</button>
                     </td>
+                    <td>\${utmBadges.length > 0 ? utmBadges.join(' ') : '<span style="color: var(--color-text-muted);">-</span>'}</td>
                     <td>\${new Date(email.created_at).toLocaleDateString()}</td>
                     <td>
                         <button class="btn btn-sm btn-outline" onclick="copyEmail('\${email.email}')">Copy</button>
                     </td>
                 </tr>
-            \`).join('');
+                \`;
+            }).join('');
             
             document.getElementById('showing-text').textContent = \`Showing \${data.emails.length} of \${data.total}\`;
+            
+            // Update UTM source filter dropdown
+            const utmSourceSelect = document.getElementById('filter-utm-source');
+            const currentUtmSource = utmSourceSelect.value;
+            if (data.utmSources && data.utmSources.length > 0) {
+                utmSourceSelect.innerHTML = '<option value="">All Sources</option>' + 
+                    data.utmSources.map(s => \`<option value="\${s}">\${s}</option>\`).join('');
+                utmSourceSelect.value = currentUtmSource;
+            }
             
             // Pagination
             const pagination = document.getElementById('pagination');
@@ -1690,6 +1756,7 @@ function getAdminHTML() {
         function clearFilters() {
             document.getElementById('filter-search').value = '';
             document.getElementById('filter-tag').value = '';
+            document.getElementById('filter-utm-source').value = '';
             document.getElementById('filter-date-from').value = '';
             document.getElementById('filter-date-to').value = '';
             currentPage = 1;
@@ -1813,11 +1880,14 @@ function getAdminHTML() {
                 showToast('No emails to export');
                 return;
             }
-            
-            // Create CSV
+
+            // Create CSV with UTM data
             const csv = [
-                'Email,Signup Date,Tags',
-                ...data.emails.map(e => \`"\${e.email}","\${new Date(e.created_at).toLocaleString()}","\${e.tags.map(t => t.name).join(', ')}"\`)
+                'Email,Signup Date,Tags,UTM Source,UTM Campaign,Video',
+                ...data.emails.map(e => {
+                    const utm = e.utm_data ? JSON.parse(e.utm_data) : {};
+                    return \`"\${e.email}","\${new Date(e.created_at).toLocaleString()}","\${e.tags.map(t => t.name).join(', ')}","\${utm.utm_source || ''}","\${utm.utm_campaign || ''}","\${utm.video || ''}"\`;
+                })
             ].join('\\n');
             
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -1851,12 +1921,15 @@ function getAdminHTML() {
                 showToast('No emails to export');
                 return;
             }
-            
+
             const csv = [
-                'Email,Signup Date,Tags',
-                ...data.emails.map(e => \`"\${e.email}","\${new Date(e.created_at).toLocaleString()}","\${e.tags.map(t => t.name).join(', ')}"\`)
+                'Email,Signup Date,Tags,UTM Source,UTM Campaign,Video',
+                ...data.emails.map(e => {
+                    const utm = e.utm_data ? JSON.parse(e.utm_data) : {};
+                    return \`"\${e.email}","\${new Date(e.created_at).toLocaleString()}","\${e.tags.map(t => t.name).join(', ')}","\${utm.utm_source || ''}","\${utm.utm_campaign || ''}","\${utm.video || ''}"\`;
+                })
             ].join('\\n');
-            
+
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1864,27 +1937,30 @@ function getAdminHTML() {
             a.download = \`flowcraft-waitlist-\${new Date().toISOString().split('T')[0]}.csv\`;
             a.click();
             URL.revokeObjectURL(url);
-            
+
             showToast(\`Exported \${data.emails.length} emails!\`);
             loadAll();
         }
 
         async function exportSelected() {
             if (selectedEmails.size === 0) return;
-            
+
             const res = await fetch('/api/export', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ emailIds: Array.from(selectedEmails) })
             });
-            
+
             const data = await res.json();
-            
+
             const csv = [
-                'Email,Signup Date,Tags',
-                ...data.emails.map(e => \`"\${e.email}","\${new Date(e.created_at).toLocaleString()}","\${e.tags.map(t => t.name).join(', ')}"\`)
+                'Email,Signup Date,Tags,UTM Source,UTM Campaign,Video',
+                ...data.emails.map(e => {
+                    const utm = e.utm_data ? JSON.parse(e.utm_data) : {};
+                    return \`"\${e.email}","\${new Date(e.created_at).toLocaleString()}","\${e.tags.map(t => t.name).join(', ')}","\${utm.utm_source || ''}","\${utm.utm_campaign || ''}","\${utm.video || ''}"\`;
+                })
             ].join('\\n');
-            
+
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1892,7 +1968,7 @@ function getAdminHTML() {
             a.download = \`flowcraft-selected-\${new Date().toISOString().split('T')[0]}.csv\`;
             a.click();
             URL.revokeObjectURL(url);
-            
+
             showToast(\`Exported \${data.emails.length} selected emails!\`);
         }
 
