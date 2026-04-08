@@ -1661,10 +1661,10 @@ function getAdminHTML() {
             tbody.innerHTML = data.emails.map(email => {
                 const utm = email.utm_data ? JSON.parse(email.utm_data) : {};
                 const utmBadges = [];
-                if (utm.utm_source) utmBadges.push(`<span class="tag" style="background: #38A169;">${utm.utm_source}</span>`);
-                if (utm.utm_campaign) utmBadges.push(`<span class="tag" style="background: #805AD5;">${utm.utm_campaign}</span>`);
-                if (utm.video) utmBadges.push(`<span class="tag" style="background: #D69E2E;">Video ${utm.video}</span>`);
-                
+                if (utm.utm_source) utmBadges.push(\`<span class="tag" style="background: #38A169;">\${utm.utm_source}</span>\`);
+                if (utm.utm_campaign) utmBadges.push(\`<span class="tag" style="background: #805AD5;">\${utm.utm_campaign}</span>\`);
+                if (utm.video) utmBadges.push(\`<span class="tag" style="background: #D69E2E;">Video \${utm.video}</span>\`);
+
                 return \`
                 <tr class="\${selectedEmails.has(email.id) ? 'selected' : ''}">
                     <td><input type="checkbox" class="checkbox" \${selectedEmails.has(email.id) ? 'checked' : ''} onchange="toggleEmail('\${email.id}')"></td>
