@@ -1,0 +1,16 @@
+{
+  "name": "flowcraft-website",
+  "version": "1.0.0",
+  "description": "FlowCraft website - Find Your Focus with ADHD",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

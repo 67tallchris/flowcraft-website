@@ -1,0 +1,11 @@
+name = "flowcraft-website"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# Workers Logs
+[observability]
+enabled = true
+
+# Routes
+# workers_dev = true
+# routes = ["flowcraft.example.com/*"]
