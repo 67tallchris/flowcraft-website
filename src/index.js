@@ -135,31 +135,15 @@ async function initDB(DB) {
 
     // Insert default template if not exists
     try {
-      await DB.exec(`
-        INSERT OR IGNORE INTO email_templates (id, name, subject, body_markdown, is_active) VALUES (
-          'welcome-email',
-          'Welcome Email',
-          'You''re on the FlowCraft Waitlist! 🎯',
-          '# You''re on the List!
-
-Thanks for joining the **FlowCraft** waitlist! We''re building something special for people with ADHD who are tired of productivity systems that don''t work.
-
-> "What conditions make it more possible for my brain to function well?"
-
-## What happens next?
-
-- We''ll notify you when the next group coaching cohort opens
-- You''ll get exclusive early access to the FlowCraft webapp
-- Join a community of ADHD knowledge workers
-
-In the meantime, start noticing when you''re focused and when you''re not. That''s the first step of the FlowCraft Loop: **Observe → Experiment → Measure → Adjust**.
-
----
-
-*— The FlowCraft Team*',
-          1
-        );
-      `);
+      await DB.prepare(
+        `INSERT OR IGNORE INTO email_templates (id, name, subject, body_markdown, is_active) VALUES (?, ?, ?, ?, ?)`
+      ).bind(
+        'welcome-email',
+        'Welcome Email',
+        'You are on the FlowCraft Waitlist!',
+        '# You are on the List!\n\nThanks for joining the FlowCraft waitlist!\n\n> What conditions make it more possible for my brain to function well?\n\n## What happens next?\n\n- We will notify you when the next group coaching cohort opens\n- You will get exclusive early access to the FlowCraft webapp\n- Join a community of ADHD knowledge workers\n\n---\n\n*The FlowCraft Team*',
+        1
+      ).run();
     } catch (e) {
       // Template might already exist
     }
