@@ -135,10 +135,16 @@ async function handleWaitlistSignup(request, env) {
 
     const id = generateId();
     const utmData = utm ? JSON.stringify(utm) : null;
-    
+    const emailLower = email.toLowerCase();
+
     await env.DB.prepare(
       'INSERT INTO waitlist_emails (id, email, utm_data) VALUES (?, ?, ?)'
-    ).bind(id, email.toLowerCase(), utmData).run();
+    ).bind(id, emailLower, utmData).run();
+
+    // Send emails in background (don't block response)
+    if (env.RESEND_API_KEY) {
+      ctx.waitUntil(sendEmails(env, emailLower, utm));
+    }
 
     return new Response(JSON.stringify({ success: true, message: 'Joined waitlist!' }), {
       headers: { 'content-type': 'application/json' },
@@ -155,6 +161,106 @@ async function handleWaitlistSignup(request, env) {
       headers: { 'content-type': 'application/json' },
     });
   }
+}
+
+// Send admin notification and confirmation email
+async function sendEmails(env, email, utm) {
+  const headers = {
+    'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+    'Content-Type': 'application/json',
+  };
+
+  // Admin notification
+  if (env.NOTIFICATION_EMAIL) {
+    const utmText = utm ? Object.entries(utm).map(([k, v]) => `${k}: ${v}`).join('\n') : 'None';
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        from: 'FlowCraft <onboarding@resend.dev>',
+        to: [env.NOTIFICATION_EMAIL],
+        subject: `🎉 New FlowCraft Waitlist Signup: ${email}`,
+        html: getAdminEmailHTML(email, utm),
+      }),
+    }).catch(() => {});
+  }
+
+  // Confirmation email to user
+  fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      from: 'FlowCraft <onboarding@resend.dev>',
+      to: [email],
+      subject: "You're on the FlowCraft Waitlist! 🎯",
+      html: getConfirmationEmailHTML(),
+    }),
+  }).catch(() => {});
+}
+
+// Admin notification email HTML
+function getAdminEmailHTML(email, utm) {
+  const utmRows = utm ? Object.entries(utm).map(([k, v]) => `<tr><td style="padding: 4px 12px; border-bottom: 1px solid #E2E8F0;">${k}</td><td style="padding: 4px 12px; border-bottom: 1px solid #E2E8F0;">${v}</td></tr>`).join('') : '<tr><td colspan="2" style="padding: 8px; color: #718096;">No UTM data</td></tr>';
+  
+  return `<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #F9FAFB;">
+  <div style="max-width: 500px; margin: 0 auto; background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <h1 style="color: #0F4C5C; margin-top: 0;">🎉 New Waitlist Signup</h1>
+    <p style="font-size: 18px; color: #2D3748;"><strong>${email}</strong> just joined the FlowCraft waitlist!</p>
+    
+    <h3 style="color: #0F4C5C; border-bottom: 2px solid #E36414; padding-bottom: 8px;">UTM Data</h3>
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <thead>
+        <tr style="background: #F7FAFC;">
+          <th style="text-align: left; padding: 8px 12px; border-bottom: 2px solid #E2E8F0;">Parameter</th>
+          <th style="text-align: left; padding: 8px 12px; border-bottom: 2px solid #E2E8F0;">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${utmRows}
+      </tbody>
+    </table>
+    
+    <p style="margin-top: 24px; color: #718096; font-size: 14px;">View all signups: <a href="https://flowcraft-website.portercoaching.workers.dev/admin" style="color: #E36414;">Admin Dashboard</a></p>
+  </div>
+</body>
+</html>`;
+}
+
+// Confirmation email HTML
+function getConfirmationEmailHTML() {
+  return `<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #F9FAFB;">
+  <div style="max-width: 500px; margin: 0 auto; background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="font-size: 48px; margin-bottom: 8px;">🎯</div>
+      <h1 style="color: #0F4C5C; margin-top: 0;">You're on the List!</h1>
+    </div>
+    
+    <p style="font-size: 16px; color: #2D3748; line-height: 1.6;">Thanks for joining the FlowCraft waitlist! We're building something special for people with ADHD who are tired of productivity systems that don't work.</p>
+    
+    <div style="background: #F0F4F8; border-radius: 8px; padding: 20px; margin: 24px 0; border-left: 4px solid #E36414;">
+      <p style="margin: 0; color: #0F4C5C; font-style: italic; font-size: 16px;">"What conditions make it more possible for my brain to function well?"</p>
+    </div>
+    
+    <h3 style="color: #0F4C5C;">What happens next?</h3>
+    <ul style="color: #2D3748; line-height: 2;">
+      <li>We'll notify you when the next group coaching cohort opens</li>
+      <li>You'll get exclusive early access to the FlowCraft webapp</li>
+      <li>Join a community of ADHD knowledge workers</li>
+    </ul>
+    
+    <p style="color: #718096; font-size: 14px; margin-top: 24px;">In the meantime, start noticing when you're focused and when you're not. That's the first step of the FlowCraft Loop: <strong>Observe → Experiment → Measure → Adjust</strong>.</p>
+    
+    <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #E2E8F0;">
+      <p style="color: #718096; font-size: 14px; margin: 0;">— The FlowCraft Team</p>
+      <p style="color: #A0AEC0; font-size: 12px; margin-top: 8px;"><a href="https://flowcraft-website.portercoaching.workers.dev/" style="color: #A0AEC0; text-decoration: none;">flowcraft-website.portercoaching.workers.dev</a></p>
+    </div>
+  </div>
+</body>
+</html>`;
 }
 
 // Get waitlist emails with pagination and filtering
