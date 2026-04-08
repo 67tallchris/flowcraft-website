@@ -55,6 +55,18 @@ export default {
       return handleAdminVerify(request, env);
     }
 
+    if (pathname === '/api/email-templates' && request.method === 'GET') {
+      return handleGetEmailTemplates(request, env);
+    }
+
+    if (pathname === '/api/email-templates' && request.method === 'POST') {
+      return handleSaveEmailTemplate(request, env);
+    }
+
+    if (pathname === '/api/email-templates/preview' && request.method === 'POST') {
+      return handlePreviewEmailTemplate(request, env);
+    }
+
     // Admin Dashboard
     if (pathname === '/admin') {
       return new Response(getAdminHTML(), {
@@ -109,7 +121,48 @@ async function initDB(DB) {
         FOREIGN KEY (email_id) REFERENCES waitlist_emails(id),
         FOREIGN KEY (tag_id) REFERENCES tags(id)
       );
+
+      CREATE TABLE IF NOT EXISTS email_templates (
+        id TEXT PRIMARY KEY,
+        name TEXT UNIQUE NOT NULL,
+        subject TEXT NOT NULL,
+        body_markdown TEXT NOT NULL,
+        is_active INTEGER DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
     `);
+
+    // Insert default template if not exists
+    try {
+      await DB.exec(`
+        INSERT OR IGNORE INTO email_templates (id, name, subject, body_markdown, is_active) VALUES (
+          'welcome-email',
+          'Welcome Email',
+          'You''re on the FlowCraft Waitlist! 🎯',
+          '# You''re on the List!
+
+Thanks for joining the **FlowCraft** waitlist! We''re building something special for people with ADHD who are tired of productivity systems that don''t work.
+
+> "What conditions make it more possible for my brain to function well?"
+
+## What happens next?
+
+- We''ll notify you when the next group coaching cohort opens
+- You''ll get exclusive early access to the FlowCraft webapp
+- Join a community of ADHD knowledge workers
+
+In the meantime, start noticing when you''re focused and when you''re not. That''s the first step of the FlowCraft Loop: **Observe → Experiment → Measure → Adjust**.
+
+---
+
+*— The FlowCraft Team*',
+          1
+        );
+      `);
+    } catch (e) {
+      // Template might already exist
+    }
   } catch (e) {
     // Tables might already exist
   }
@@ -170,9 +223,21 @@ async function sendEmails(env, email, utm) {
     'Content-Type': 'application/json',
   };
 
+  // Get the active welcome email template
+  let template = null;
+  try {
+    const { results } = await env.DB.prepare(
+      "SELECT * FROM email_templates WHERE id = 'welcome-email' AND is_active = 1"
+    ).all();
+    if (results && results.length > 0) {
+      template = results[0];
+    }
+  } catch (e) {
+    // Fall back to hardcoded template
+  }
+
   // Admin notification
   if (env.NOTIFICATION_EMAIL) {
-    const utmText = utm ? Object.entries(utm).map(([k, v]) => `${k}: ${v}`).join('\n') : 'None';
     fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers,
@@ -186,16 +251,49 @@ async function sendEmails(env, email, utm) {
   }
 
   // Confirmation email to user
-  fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      from: 'FlowCraft <onboarding@resend.dev>',
-      to: [email],
-      subject: "You're on the FlowCraft Waitlist! 🎯",
-      html: getConfirmationEmailHTML(),
-    }),
-  }).catch(() => {});
+  if (template) {
+    const renderedHTML = simpleMarkdownToHTML(template.body_markdown);
+    const fullHTML = getEmailWrapperHTML(renderedHTML);
+    
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        from: 'FlowCraft <onboarding@resend.dev>',
+        to: [email],
+        subject: template.subject,
+        html: fullHTML,
+      }),
+    }).catch(() => {});
+  } else {
+    // Fallback to hardcoded template
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        from: 'FlowCraft <onboarding@resend.dev>',
+        to: [email],
+        subject: "You're on the FlowCraft Waitlist! 🎯",
+        html: getConfirmationEmailHTML(),
+      }),
+    }).catch(() => {});
+  }
+}
+
+// Email wrapper - adds consistent styling container
+function getEmailWrapperHTML(content) {
+  return `<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #F9FAFB;">
+  <div style="max-width: 500px; margin: 0 auto; background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    ${content}
+    <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #E2E8F0;">
+      <p style="color: #718096; font-size: 14px; margin: 0;">— The FlowCraft Team</p>
+      <p style="color: #A0AEC0; font-size: 12px; margin-top: 8px;"><a href="https://flowcraft-website.portercoaching.workers.dev/" style="color: #A0AEC0; text-decoration: none;">flowcraft-website.portercoaching.workers.dev</a></p>
+    </div>
+  </div>
+</body>
+</html>`;
 }
 
 // Admin notification email HTML
@@ -632,6 +730,122 @@ async function handleAdminVerify(request, env) {
   return new Response(JSON.stringify({ authenticated: false }), {
     headers: { 'content-type': 'application/json' },
   });
+}
+
+// Get all email templates
+async function handleGetEmailTemplates(request, env) {
+  const { results } = await env.DB.prepare(
+    'SELECT * FROM email_templates ORDER BY name'
+  ).all();
+
+  return new Response(JSON.stringify({ templates: results }), {
+    headers: { 'content-type': 'application/json' },
+  });
+}
+
+// Save/update email template
+async function handleSaveEmailTemplate(request, env) {
+  try {
+    const body = await request.json();
+    const { id, name, subject, body_markdown, is_active } = body;
+
+    if (!name || !subject || !body_markdown) {
+      return new Response(JSON.stringify({ error: 'Name, subject, and body are required' }), {
+        status: 400,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+
+    const templateId = id || generateId();
+    const now = new Date().toISOString();
+
+    await env.DB.prepare(
+      `INSERT INTO email_templates (id, name, subject, body_markdown, is_active, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET 
+         name = excluded.name, 
+         subject = excluded.subject, 
+         body_markdown = excluded.body_markdown, 
+         is_active = excluded.is_active,
+         updated_at = excluded.updated_at`
+    ).bind(templateId, name, subject, body_markdown, is_active ? 1 : 0, now).run();
+
+    return new Response(JSON.stringify({ success: true, id: templateId }), {
+      headers: { 'content-type': 'application/json' },
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: 'Failed to save template: ' + e.message }), {
+      status: 500,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+}
+
+// Preview email template (render markdown to HTML)
+async function handlePreviewEmailTemplate(request, env) {
+  try {
+    const body = await request.json();
+    const { body_markdown } = body;
+
+    const html = simpleMarkdownToHTML(body_markdown);
+
+    return new Response(JSON.stringify({ html }), {
+      headers: { 'content-type': 'application/json' },
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: 'Preview failed: ' + e.message }), {
+      status: 500,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+}
+
+// Simple markdown to HTML converter (no dependencies needed)
+function simpleMarkdownToHTML(md) {
+  let html = md;
+
+  // Escape HTML entities first
+  html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // Code blocks (```)
+  html = html.replace(/```([\s\S]*?)```/g, '<pre style="background:#F7FAFC;padding:12px;border-radius:6px;overflow-x:auto;font-size:13px;"><code>$1</code></pre>');
+
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code style="background:#F7FAFC;padding:2px 6px;border-radius:4px;font-size:0.9em;">$1</code>');
+
+  // Headers
+  html = html.replace(/^### (.+)$/gm, '<h3 style="color:#0F4C5C;margin:16px 0 8px;">$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2 style="color:#0F4C5C;margin:20px 0 10px;">$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1 style="color:#0F4C5C;margin:0 0 12px;">$1</h1>');
+
+  // Bold and italic
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+  // Blockquotes
+  html = html.replace(/^&gt; (.+)$/gm, '<blockquote style="margin:16px 0;padding:16px 20px;background:#F0F4F8;border-left:4px solid #E36414;border-radius:0 8px 8px 0;font-style:italic;color:#0F4C5C;">$1</blockquote>');
+
+  // Horizontal rule
+  html = html.replace(/^---$/gm, '<hr style="border:none;border-top:1px solid #E2E8F0;margin:24px 0;">');
+
+  // Unordered lists
+  html = html.replace(/^- (.+)$/gm, '<li style="margin:4px 0;">$1</li>');
+  html = html.replace(/((?:<li[^>]*>.*<\/li>\n?)+)/g, '<ul style="margin:8px 0;padding-left:24px;line-height:1.8;">$1</ul>');
+
+  // Paragraphs (double newlines)
+  html = html.replace(/\n\n/g, '</p><p style="margin:8px 0;line-height:1.6;">');
+  html = '<p style="margin:8px 0;line-height:1.6;">' + html + '</p>';
+
+  // Clean up empty paragraphs
+  html = html.replace(/<p[^>]*><\/p>/g, '');
+  html = html.replace(/<p[^>]*>(<(?:h[1-6]|ul|ol|blockquote|pre|hr)[^>]*>)/g, '$1');
+  html = html.replace(/(<\/(?:h[1-6]|ul|ol|blockquote|pre|hr)[^>]*>)<\/p>/g, '$1');
+
+  // Line breaks
+  html = html.replace(/\n/g, '<br>');
+
+  return html;
 }
 
 // Get website HTML
@@ -1498,6 +1712,7 @@ function getAdminHTML() {
                         <button class="btn btn-outline" onclick="showTab('emails')">Emails</button>
                         <button class="btn btn-outline" onclick="showTab('exports')">Export Logs</button>
                         <button class="btn btn-outline" onclick="showTab('tags')">Manage Tags</button>
+                        <button class="btn btn-outline" onclick="showTab('email-templates')">✉️ Email Templates</button>
                         <button class="btn btn-outline" onclick="showTab('help')">📖 Tracking Guide</button>
                         <button class="btn btn-danger" onclick="logout()">Logout</button>
                     </div>
@@ -1763,6 +1978,86 @@ function getAdminHTML() {
                         </div>
                     </div>
                 </div>
+
+                <!-- Email Templates Tab -->
+                <div id="tab-email-templates" class="tab-content">
+                    <div style="max-width: 1200px;">
+                        <h2 style="margin-bottom: 0.5rem;">✉️ Email Templates</h2>
+                        <p style="color: var(--color-text-muted); margin-bottom: 2rem;">Customize the welcome email that new waitlist signups receive. Supports markdown formatting.</p>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <!-- Editor Panel -->
+                            <div>
+                                <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                        <h3 style="margin: 0;">Editor</h3>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn btn-sm btn-outline" onclick="insertMarkdown('# ', 'Heading 1')" title="Heading 1">H1</button>
+                                            <button class="btn btn-sm btn-outline" onclick="insertMarkdown('## ', 'Heading 2')" title="Heading 2">H2</button>
+                                            <button class="btn btn-sm btn-outline" onclick="insertMarkdown('**', 'bold text**')" title="Bold"><strong>B</strong></button>
+                                            <button class="btn btn-sm btn-outline" onclick="insertMarkdown('*', 'italic text*')" title="Italic"><em>I</em></button>
+                                            <button class="btn btn-sm btn-outline" onclick="insertMarkdown('> ', 'quote')" title="Quote">"</button>
+                                            <button class="btn btn-sm btn-outline" onclick="insertMarkdown('- ', 'list item')" title="List">•</button>
+                                            <button class="btn btn-sm btn-outline" onclick="insertMarkdown('---\n', '')" title="Divider">—</button>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-bottom: 1rem;">
+                                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: 500;">Email Subject</label>
+                                        <input type="text" id="template-subject" placeholder="You're on the FlowCraft Waitlist! 🎯" style="width: 100%;">
+                                    </div>
+
+                                    <div style="margin-bottom: 1rem;">
+                                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: 500;">Template Name</label>
+                                        <input type="text" id="template-name" value="Welcome Email" style="width: 100%;" readonly>
+                                    </div>
+
+                                    <div style="margin-bottom: 1rem;">
+                                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: 500;">
+                                            Email Body (Markdown)
+                                            <span style="color: var(--color-text-muted); font-weight: 400; font-size: 0.75rem;">— supports # headings, **bold**, *italic*, > quotes, - lists, --- dividers</span>
+                                        </label>
+                                        <textarea id="template-body" style="width: 100%; min-height: 400px; font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 13px; line-height: 1.6; padding: 12px; border: 1px solid var(--color-border); border-radius: 6px; resize: vertical;" placeholder="# Welcome!
+
+Thanks for joining..."></textarea>
+                                    </div>
+
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <button class="btn btn-primary" onclick="saveEmailTemplate()">💾 Save Template</button>
+                                        <button class="btn btn-outline" onclick="previewEmailTemplate()">👁️ Preview</button>
+                                        <button class="btn btn-outline" onclick="loadEmailTemplate()">🔄 Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preview Panel -->
+                            <div>
+                                <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border);">
+                                    <h3 style="margin: 0 0 1rem;">Live Preview</h3>
+                                    
+                                    <div style="background: #F9FAFB; border-radius: 8px; padding: 20px; min-height: 400px; border: 1px solid var(--color-border);">
+                                        <div style="max-width: 400px; margin: 0 auto; background: white; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                            <div id="template-preview" style="font-size: 14px; line-height: 1.6;">
+                                                <p style="color: var(--color-text-muted); text-align: center; padding: 40px 0;">Click "Preview" to see how your email will look</p>
+                                            </div>
+                                            <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #E2E8F0;">
+                                                <p style="color: #718096; font-size: 12px; margin: 0;">— The FlowCraft Team</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Saved Templates -->
+                        <div style="margin-top: 2rem; background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border);">
+                            <h3 style="margin: 0 0 1rem;">Saved Templates</h3>
+                            <div id="templates-list" style="display: grid; gap: 0.75rem;">
+                                <p style="color: var(--color-text-muted); text-align: center; padding: 1rem;">Loading templates...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2002,6 +2297,7 @@ function getAdminHTML() {
 
             if (tab === 'exports') loadExportLogs();
             if (tab === 'tags') loadTags();
+            if (tab === 'email-templates') loadEmailTemplates();
         }
 
         // URL Builder functions
@@ -2329,6 +2625,144 @@ function getAdminHTML() {
 
         // Init
         checkAuth();
+
+        // Email Template functions
+        async function loadEmailTemplates() {
+            const res = await fetch('/api/email-templates');
+            const data = await res.json();
+            
+            const list = document.getElementById('templates-list');
+            if (!data.templates || data.templates.length === 0) {
+                list.innerHTML = '<p style="color: var(--color-text-muted); text-align: center; padding: 1rem;">No templates yet</p>';
+                return;
+            }
+            
+            list.innerHTML = data.templates.map(t => \`
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--color-bg); border-radius: 6px; border: 1px solid var(--color-border);">
+                    <div>
+                        <div style="font-weight: 600;">\${t.name}</div>
+                        <div style="font-size: 0.8rem; color: var(--color-text-muted);">Subject: \${t.subject}</div>
+                        <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px;">
+                            \${t.is_active ? '<span style="color: #38A169;">● Active</span>' : '<span style="color: #A0AEC0;">○ Inactive</span>'}
+                            · Updated \${new Date(t.updated_at).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-sm btn-outline" onclick="editTemplate('\${t.id}')">Edit</button>
+                        <button class="btn btn-sm btn-outline" onclick="toggleTemplate('\${t.id}', \${!t.is_active})">\${t.is_active ? 'Deactivate' : 'Activate'}</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteTemplate('\${t.id}')">Delete</button>
+                    </div>
+                </div>
+            \`).join('');
+        }
+
+        async function saveEmailTemplate() {
+            const subject = document.getElementById('template-subject').value;
+            const body = document.getElementById('template-body').value;
+            
+            if (!subject || !body) {
+                showToast('Subject and body are required!');
+                return;
+            }
+            
+            const res = await fetch('/api/email-templates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: 'welcome-email',
+                    name: 'Welcome Email',
+                    subject,
+                    body_markdown: body,
+                    is_active: true
+                })
+            });
+            
+            const data = await res.json();
+            if (res.ok) {
+                showToast('Template saved!');
+                loadEmailTemplates();
+            } else {
+                showToast(data.error || 'Failed to save');
+            }
+        }
+
+        async function previewEmailTemplate() {
+            const body = document.getElementById('template-body').value;
+            
+            if (!body) {
+                showToast('Write something first!');
+                return;
+            }
+            
+            const res = await fetch('/api/email-templates/preview', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ body_markdown: body })
+            });
+            
+            const data = await res.json();
+            document.getElementById('template-preview').innerHTML = data.html;
+        }
+
+        async function loadEmailTemplate() {
+            const res = await fetch('/api/email-templates');
+            const data = await res.json();
+            
+            const template = data.templates?.find(t => t.id === 'welcome-email');
+            if (template) {
+                document.getElementById('template-subject').value = template.subject;
+                document.getElementById('template-body').value = template.body_markdown;
+                showToast('Template loaded!');
+            } else {
+                showToast('No saved template found');
+            }
+        }
+
+        async function editTemplate(id) {
+            const res = await fetch('/api/email-templates');
+            const data = await res.json();
+            
+            const template = data.templates?.find(t => t.id === id);
+            if (template) {
+                document.getElementById('template-subject').value = template.subject;
+                document.getElementById('template-body').value = template.body_markdown;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        async function toggleTemplate(id, isActive) {
+            const res = await fetch('/api/email-templates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, is_active: isActive })
+            });
+            
+            if (res.ok) {
+                showToast(\`Template \${isActive ? 'activated' : 'deactivated'}!\`);
+                loadEmailTemplates();
+            }
+        }
+
+        async function deleteTemplate(id) {
+            if (!confirm('Delete this template?')) return;
+            
+            // Can't delete via API yet, just show message
+            showToast('Delete not implemented yet. Use deactivate instead.');
+        }
+
+        function insertMarkdown(before, after) {
+            const textarea = document.getElementById('template-body');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            const selectedText = text.substring(start, end) || after.replace(/\\*|>|#|-/g, '').trim() || 'text';
+            
+            const newText = text.substring(0, start) + before + selectedText + after + text.substring(end);
+            textarea.value = newText;
+            textarea.focus();
+            textarea.selectionStart = start + before.length;
+            textarea.selectionEnd = start + before.length + selectedText.length;
+        }
     </script>
 </body>
 </html>`;
