@@ -1392,6 +1392,7 @@ function getAdminHTML() {
                         <button class="btn btn-outline" onclick="showTab('emails')">Emails</button>
                         <button class="btn btn-outline" onclick="showTab('exports')">Export Logs</button>
                         <button class="btn btn-outline" onclick="showTab('tags')">Manage Tags</button>
+                        <button class="btn btn-outline" onclick="showTab('help')">📖 Tracking Guide</button>
                         <button class="btn btn-danger" onclick="logout()">Logout</button>
                     </div>
                 </div>
@@ -1509,6 +1510,150 @@ function getAdminHTML() {
                             <h2 style="margin-bottom: 1rem;">Existing Tags</h2>
                             <div id="tags-list" style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border);">
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help / Tracking Guide Tab -->
+                <div id="tab-help" class="tab-content">
+                    <div style="max-width: 900px;">
+                        <h2 style="margin-bottom: 0.5rem;">📖 UTM Tracking Guide</h2>
+                        <p style="color: var(--color-text-muted); margin-bottom: 2rem;">Learn how to track where your signups come from using URL parameters.</p>
+
+                        <!-- What are UTM Parameters -->
+                        <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); margin-bottom: 1.5rem;">
+                            <h3 style="color: var(--color-primary-dark); margin-bottom: 0.75rem;">What are UTM Parameters?</h3>
+                            <p style="margin-bottom: 1rem;">UTM parameters are tags you add to your URLs to track where traffic comes from. When someone clicks a link with these parameters and signs up, the tracking data is automatically saved with their email.</p>
+                            
+                            <div style="background: var(--color-bg); padding: 1rem; border-radius: 6px; border-left: 4px solid var(--color-accent);">
+                                <p style="font-family: monospace; font-size: 0.875rem; margin: 0; word-break: break-all;">
+                                    https://flowcraft-website.portercoaching.workers.dev/<br>
+                                    <span style="color: var(--color-text-muted);">?utm_source=youtube</span><span style="color: var(--color-accent);">&utm_medium=video</span><span style="color: #805AD5;">&utm_campaign=video1-launch</span><span style="color: #D69E2E;">&video=1</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Parameter Reference -->
+                        <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); margin-bottom: 1.5rem;">
+                            <h3 style="color: var(--color-primary-dark); margin-bottom: 1rem;">Parameter Reference</h3>
+                            
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid var(--color-border);">
+                                        <th style="text-align: left; padding: 0.75rem 0.5rem;">Parameter</th>
+                                        <th style="text-align: left; padding: 0.75rem 0.5rem;">Purpose</th>
+                                        <th style="text-align: left; padding: 0.75rem 0.5rem;">Example Values</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid var(--color-border);">
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="background: var(--color-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">utm_source</code></td>
+                                        <td style="padding: 0.75rem 0.5rem;">Where the traffic comes from</td>
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="font-size: 0.8rem;">youtube, twitter, google, newsletter, tiktok, instagram</code></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid var(--color-border);">
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="background: var(--color-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">utm_medium</code></td>
+                                        <td style="padding: 0.75rem 0.5rem;">The marketing channel type</td>
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="font-size: 0.8rem;">video, social, email, organic, paid, cpc</code></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid var(--color-border);">
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="background: var(--color-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">utm_campaign</code></td>
+                                        <td style="padding: 0.75rem 0.5rem;">The specific campaign name</td>
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="font-size: 0.8rem;">video1-launch, summer-promo, adhd-month</code></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid var(--color-border);">
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="background: var(--color-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">utm_content</code></td>
+                                        <td style="padding: 0.75rem 0.5rem;">Differentiate similar content</td>
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="font-size: 0.8rem;">banner, text-link, thumbnail-a, thumbnail-b</code></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid var(--color-border);">
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="background: var(--color-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">utm_term</code></td>
+                                        <td style="padding: 0.75rem 0.5rem;">Paid search keywords</td>
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="font-size: 0.8rem;">adhd+focus, productivity+app</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="background: var(--color-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">video</code></td>
+                                        <td style="padding: 0.75rem 0.5rem;">Video variant number</td>
+                                        <td style="padding: 0.75rem 0.5rem;"><code style="font-size: 0.8rem;">1, 2, 3, etc.</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Quick URL Builder -->
+                        <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); margin-bottom: 1.5rem;">
+                            <h3 style="color: var(--color-primary-dark); margin-bottom: 0.75rem;">🔗 Quick URL Builder</h3>
+                            <p style="color: var(--color-text-muted); margin-bottom: 1rem;">Fill in the fields below to generate a tracking URL.</p>
+                            
+                            <div style="display: grid; gap: 0.75rem;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Video Number</label>
+                                    <input type="number" id="help-video" placeholder="e.g., 1" min="1" style="width: 100%; max-width: 150px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Source (utm_source)</label>
+                                    <input type="text" id="help-source" placeholder="e.g., youtube" style="width: 100%;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Medium (utm_medium)</label>
+                                    <input type="text" id="help-medium" placeholder="e.g., video" style="width: 100%;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500;">Campaign (utm_campaign)</label>
+                                    <input type="text" id="help-campaign" placeholder="e.g., video1-launch" style="width: 100%;">
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; align-items: center;">
+                                <button class="btn btn-primary" onclick="generateTrackingUrl()">Generate URL</button>
+                                <button class="btn btn-outline" onclick="copyGeneratedUrl()">Copy URL</button>
+                            </div>
+                            
+                            <div id="generated-url" style="margin-top: 1rem; padding: 1rem; background: var(--color-bg); border-radius: 6px; display: none;">
+                                <p style="font-family: monospace; font-size: 0.8rem; word-break: break-all; margin: 0;" id="generated-url-text"></p>
+                            </div>
+                        </div>
+
+                        <!-- Example URLs -->
+                        <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); margin-bottom: 1.5rem;">
+                            <h3 style="color: var(--color-primary-dark); margin-bottom: 0.75rem;">Example Tracking URLs</h3>
+                            <div style="display: grid; gap: 0.75rem;">
+                                <div style="padding: 0.75rem; background: var(--color-bg); border-radius: 6px;">
+                                    <p style="font-weight: 500; margin-bottom: 0.25rem;">YouTube Video 1</p>
+                                    <p style="font-family: monospace; font-size: 0.8rem; word-break: break-all; margin: 0; color: var(--color-text-muted);">
+                                        ?utm_source=youtube&utm_medium=video&utm_campaign=video1&video=1
+                                    </p>
+                                </div>
+                                <div style="padding: 0.75rem; background: var(--color-bg); border-radius: 6px;">
+                                    <p style="font-weight: 500; margin-bottom: 0.25rem;">Twitter Post</p>
+                                    <p style="font-family: monospace; font-size: 0.8rem; word-break: break-all; margin: 0; color: var(--color-text-muted);">
+                                        ?utm_source=twitter&utm_medium=social&utm_campaign=launch-announcement
+                                    </p>
+                                </div>
+                                <div style="padding: 0.75rem; background: var(--color-bg); border-radius: 6px;">
+                                    <p style="font-weight: 500; margin-bottom: 0.25rem;">Email Newsletter</p>
+                                    <p style="font-family: monospace; font-size: 0.8rem; word-break: break-all; margin: 0; color: var(--color-text-muted);">
+                                        ?utm_source=newsletter&utm_medium=email&utm_campaign=april-2024
+                                    </p>
+                                </div>
+                                <div style="padding: 0.75rem; background: var(--color-bg); border-radius: 6px;">
+                                    <p style="font-weight: 500; margin-bottom: 0.25rem;">Google Ads</p>
+                                    <p style="font-family: monospace; font-size: 0.8rem; word-break: break-all; margin: 0; color: var(--color-text-muted);">
+                                        ?utm_source=google&utm_medium=paid&utm_campaign=adhd-awareness&utm_term=adhd+productivity
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- How to View Data -->
+                        <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border);">
+                            <h3 style="color: var(--color-primary-dark); margin-bottom: 0.75rem;">📊 Viewing Tracking Data</h3>
+                            <ul style="margin-left: 1.5rem; line-height: 2;">
+                                <li><strong>Emails Tab:</strong> The "Source / UTM" column shows colored badges for each tracked parameter.</li>
+                                <li><strong>Filter by Source:</strong> Use the "All Sources" dropdown in the filters bar to see signups from a specific source.</li>
+                                <li><strong>Export with UTM Data:</strong> All CSV exports include UTM Source, UTM Campaign, and Video columns.</li>
+                                <li><strong>Export Logs:</strong> See when exports happened and what filters were used.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -1748,9 +1893,40 @@ function getAdminHTML() {
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(\`tab-\${tab}\`).classList.add('active');
-            
+
             if (tab === 'exports') loadExportLogs();
             if (tab === 'tags') loadTags();
+        }
+
+        // URL Builder functions
+        function generateTrackingUrl() {
+            const video = document.getElementById('help-video').value;
+            const source = document.getElementById('help-source').value;
+            const medium = document.getElementById('help-medium').value;
+            const campaign = document.getElementById('help-campaign').value;
+            
+            const baseUrl = 'https://flowcraft-website.portercoaching.workers.dev/';
+            const params = [];
+            
+            if (source) params.push(\`utm_source=\${encodeURIComponent(source)}\`);
+            if (medium) params.push(\`utm_medium=\${encodeURIComponent(medium)}\`);
+            if (campaign) params.push(\`utm_campaign=\${encodeURIComponent(campaign)}\`);
+            if (video) params.push(\`video=\${encodeURIComponent(video)}\`);
+            
+            const url = params.length > 0 ? baseUrl + '?' + params.join('&') : baseUrl;
+            
+            document.getElementById('generated-url-text').textContent = url;
+            document.getElementById('generated-url').style.display = 'block';
+        }
+
+        function copyGeneratedUrl() {
+            const urlText = document.getElementById('generated-url-text').textContent;
+            if (!urlText) {
+                showToast('Generate a URL first!');
+                return;
+            }
+            navigator.clipboard.writeText(urlText);
+            showToast('URL copied to clipboard!');
         }
 
         function clearFilters() {
