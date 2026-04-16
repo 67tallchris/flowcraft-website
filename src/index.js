@@ -1126,7 +1126,7 @@ function getWebsiteHTML() {
     <main>
         <section class="hero">
             <div class="container text-center fade-in">
-                <h1 class="mb-md">What if nobody ever taught you how to find your focus?</h1>
+                <h1 class="mb-md">No one taught you how to find your focus.</h1>
                 <p class="lead" style="max-width: 700px; margin: 0 auto 2rem;">
                     Every productivity system you've tried promises to get you into flow consistently. And none of them reliably do. It's time to stop fixing yourself and start designing for your brain.
                 </p>
