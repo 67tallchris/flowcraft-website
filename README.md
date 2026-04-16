@@ -126,11 +126,6 @@ npm run deploy
 npx wrangler d1 execute flowcraft-waitlist --file=schema.sql --remote
 ```
 
-3. Set the admin password:
-```bash
-npx wrangler secret put ADMIN_PASSWORD
-```
-
 ## API Endpoints
 
 ### Public
@@ -148,51 +143,6 @@ npx wrangler secret put ADMIN_PASSWORD
 - `POST /api/admin/login` — Admin login
 - `POST /api/admin/logout` — Admin logout
 - `GET /api/admin/verify` — Verify admin session
-
-## Admin Dashboard Usage
-
-### Logging In
-1. Navigate to `/admin`
-2. Enter the admin password (default: `flowcraft-admin-2024`)
-
-### Managing Tags
-1. Go to the "Manage Tags" tab
-2. Create a new tag with a name and color
-3. Tags can be added to emails from the Emails tab
-
-### Exporting Emails
-1. **Quick Export:** Click "Export Current View" to export with active filters
-2. **Filtered Export:** Click "Export with Filters" to set custom filters
-3. **Selected Export:** Select specific emails and click "Export Selected"
-
-All exports are logged in the "Export Logs" tab with timestamps and filter details.
-
-### Filtering Emails
-- **Search:** Type to search emails by email address
-- **Tag Filter:** Select a tag to show only emails with that tag
-- **Date Range:** Set "From" and "To" dates to filter by signup date
-
-## Changing the Admin Password
-
-```bash
-npx wrangler secret put ADMIN_PASSWORD
-```
-
-You'll be prompted to enter the new password.
-
-## Database Schema
-
-The D1 database has four tables:
-
-- `waitlist_emails` — Email signups with timestamps
-- `tags` — Custom tags with colors
-- `email_tags` — Junction table linking emails to tags
-- `export_logs` — Log of all exports with filters used
-
-## Scripts
-
-- `npm run dev` — Start local development server
-- `npm run deploy` — Deploy to Cloudflare Workers
 
 ## License
 
