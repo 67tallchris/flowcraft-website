@@ -1111,7 +1111,7 @@ function getWebsiteHTML() {
         <div class="container">
             <nav>
                 <a href="#" class="logo">
-                    <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" height="16">
+                    <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" height="8">
                 </a>
                 <div class="nav-links">
                     <a href="#story">The Story</a>
@@ -1324,7 +1324,7 @@ function getWebsiteHTML() {
     <footer>
         <div class="container">
             <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
-                <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" height="14">
+                <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" height="7">
             </div>
             <p>&copy; 2023 FlowCraft. All rights reserved.</p>
             <p style="font-size: 0.875rem;">
