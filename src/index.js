@@ -67,6 +67,20 @@ export default {
       return handlePreviewEmailTemplate(request, env);
     }
 
+    // Privacy Policy
+    if (pathname === '/privacy') {
+      return new Response(getPrivacyHTML(), {
+        headers: { 'content-type': 'text/html;charset=UTF-8' },
+      });
+    }
+
+    // Terms of Service
+    if (pathname === '/terms') {
+      return new Response(getTermsHTML(), {
+        headers: { 'content-type': 'text/html;charset=UTF-8' },
+      });
+    }
+
     // Admin Dashboard
     if (pathname === '/admin') {
       return new Response(getAdminHTML(), {
@@ -1111,7 +1125,7 @@ function getWebsiteHTML() {
         <div class="container">
             <nav>
                 <a href="#" class="logo">
-                    <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" height="8">
+                    <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" style="height: 34px; width: auto; display: inline;">
                 </a>
                 <div class="nav-links">
                     <a href="#story">The Story</a>
@@ -1288,7 +1302,7 @@ function getWebsiteHTML() {
                         </div>
                     </div>
                     <div class="app-visual">
-                        <img src="https://picsum.photos/seed/appui/800/600" alt="FlowCraft Webapp Interface Preview">
+                        <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/Headshot-W-Hat-Cropped.jpg" alt="FlowCraft Webapp Interface Preview">
                     </div>
                 </div>
             </div>
@@ -1324,11 +1338,11 @@ function getWebsiteHTML() {
     <footer>
         <div class="container">
             <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
-                <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" height="7">
+                <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" style="height: 34px; width: auto; display: inline;">
             </div>
-            <p>&copy; 2023 FlowCraft. All rights reserved.</p>
+            <p>&copy; 2026 FlowCraft. All rights reserved.</p>
             <p style="font-size: 0.875rem;">
-                <a href="#">Privacy Policy</a> &middot; <a href="#">Terms of Service</a>
+                <a href="/privacy">Privacy Policy</a> &middot; <a href="/terms">Terms of Service</a>
             </p>
         </div>
     </footer>
@@ -1407,6 +1421,144 @@ function getWebsiteHTML() {
             }
         });
     </script>
+</body>
+</html>`;
+}
+
+// Privacy Policy
+function getPrivacyHTML() {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — FlowCraft</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; color: #222; line-height: 1.8; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.25rem; margin-top: 2rem; }
+    p, li { font-size: 1rem; }
+    a { color: #e36414; }
+    .back { display: inline-block; margin-bottom: 2rem; font-family: sans-serif; font-size: 0.875rem; color: #e36414; text-decoration: none; }
+    .back:hover { text-decoration: underline; }
+    footer { margin-top: 3rem; font-size: 0.875rem; color: #666; font-family: sans-serif; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">&larr; Back to FlowCraft</a>
+  <h1>Privacy Policy</h1>
+  <p><em>Last updated: April 2026</em></p>
+
+  <p>FlowCraft ("we", "us", or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you visit our website or join our waitlist.</p>
+
+  <h2>1. Information We Collect</h2>
+  <p>We collect only the information you voluntarily provide, which may include:</p>
+  <ul>
+    <li>Your email address when you join our waitlist</li>
+    <li>Basic usage data (page visits, referral source) via standard server logs</li>
+  </ul>
+
+  <h2>2. How We Use Your Information</h2>
+  <p>We use the information we collect to:</p>
+  <ul>
+    <li>Send you updates about FlowCraft, including launch announcements and early access invitations</li>
+    <li>Understand how people find and use our site so we can improve it</li>
+  </ul>
+  <p>We will never sell, rent, or share your personal information with third parties for marketing purposes.</p>
+
+  <h2>3. Email Communications</h2>
+  <p>By joining our waitlist, you consent to receiving occasional emails from FlowCraft. You may unsubscribe at any time by replying to any email with "unsubscribe" in the subject line, or by contacting us directly.</p>
+
+  <h2>4. Data Storage</h2>
+  <p>Your email address is stored securely in a Cloudflare D1 database. We take reasonable precautions to protect your data from unauthorized access, loss, or misuse.</p>
+
+  <h2>5. Third-Party Services</h2>
+  <p>We use the following third-party services, each with their own privacy policies:</p>
+  <ul>
+    <li><strong>Cloudflare</strong> — hosting and infrastructure</li>
+    <li><strong>Resend</strong> — transactional email delivery</li>
+  </ul>
+
+  <h2>6. Cookies</h2>
+  <p>We do not use tracking cookies. We may use a session cookie solely for admin authentication purposes, which is not used to track visitors.</p>
+
+  <h2>7. Your Rights</h2>
+  <p>You have the right to request access to, correction of, or deletion of any personal data we hold about you. To exercise these rights, contact us at the email below.</p>
+
+  <h2>8. Changes to This Policy</h2>
+  <p>We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated date.</p>
+
+  <h2>9. Contact</h2>
+  <p>If you have any questions about this Privacy Policy, please contact us at: <a href="mailto:hello@flowcraft.com">hello@flowcraft.com</a></p>
+
+  <footer>&copy; 2026 FlowCraft. All rights reserved.</footer>
+</body>
+</html>`;
+}
+
+// Terms of Service
+function getTermsHTML() {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — FlowCraft</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; color: #222; line-height: 1.8; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.25rem; margin-top: 2rem; }
+    p, li { font-size: 1rem; }
+    a { color: #e36414; }
+    .back { display: inline-block; margin-bottom: 2rem; font-family: sans-serif; font-size: 0.875rem; color: #e36414; text-decoration: none; }
+    .back:hover { text-decoration: underline; }
+    footer { margin-top: 3rem; font-size: 0.875rem; color: #666; font-family: sans-serif; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">&larr; Back to FlowCraft</a>
+  <h1>Terms of Service</h1>
+  <p><em>Last updated: April 2026</em></p>
+
+  <p>Please read these Terms of Service ("Terms") carefully before using the FlowCraft website. By accessing our site or joining our waitlist, you agree to be bound by these Terms.</p>
+
+  <h2>1. Acceptance of Terms</h2>
+  <p>By using this website, you confirm that you are at least 18 years of age and agree to these Terms. If you do not agree, please do not use our site.</p>
+
+  <h2>2. Use of the Site</h2>
+  <p>You agree to use this site only for lawful purposes and in a manner that does not infringe the rights of others. You may not:</p>
+  <ul>
+    <li>Submit false or misleading information</li>
+    <li>Attempt to gain unauthorized access to any part of the site</li>
+    <li>Use automated tools to scrape or harvest data from the site</li>
+    <li>Engage in any activity that disrupts or interferes with the site's operation</li>
+  </ul>
+
+  <h2>3. Waitlist</h2>
+  <p>Joining our waitlist does not guarantee access to FlowCraft or any specific product or service. We reserve the right to determine how and when access is granted. We may contact waitlist members via the email address provided.</p>
+
+  <h2>4. Intellectual Property</h2>
+  <p>All content on this site — including text, graphics, logos, and design — is the property of FlowCraft and is protected by applicable intellectual property laws. You may not reproduce or distribute any content without our express written permission.</p>
+
+  <h2>5. Disclaimer of Warranties</h2>
+  <p>This site is provided "as is" without warranties of any kind, either express or implied. We do not warrant that the site will be error-free, uninterrupted, or free of harmful components.</p>
+
+  <h2>6. Limitation of Liability</h2>
+  <p>To the fullest extent permitted by law, FlowCraft shall not be liable for any indirect, incidental, special, or consequential damages arising out of your use of, or inability to use, this site.</p>
+
+  <h2>7. Third-Party Links</h2>
+  <p>Our site may contain links to third-party websites. We are not responsible for the content or practices of those sites and encourage you to review their terms and privacy policies.</p>
+
+  <h2>8. Changes to These Terms</h2>
+  <p>We reserve the right to modify these Terms at any time. Updated Terms will be posted on this page with a revised date. Continued use of the site after changes constitutes your acceptance of the new Terms.</p>
+
+  <h2>9. Governing Law</h2>
+  <p>These Terms shall be governed by and construed in accordance with the laws of the United States, without regard to conflict of law principles.</p>
+
+  <h2>10. Contact</h2>
+  <p>If you have questions about these Terms, please contact us at: <a href="mailto:hello@flowcraft.com">hello@flowcraft.com</a></p>
+
+  <footer>&copy; 2026 FlowCraft. All rights reserved.</footer>
 </body>
 </html>`;
 }
