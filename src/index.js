@@ -421,7 +421,7 @@ async function handleGetWaitlist(request, env) {
   params.push(limit, offset);
 
   const { results } = await env.DB.prepare(query).bind(...params).all();
-  const { results: countResults } = await env.DB.prepare(countQuery).bind(...countParams).first();
+  const countResult = await env.DB.prepare(countQuery).bind(...countParams).first();
 
   // Parse tags into arrays
   const emails = results.map(e => ({
@@ -446,10 +446,10 @@ async function handleGetWaitlist(request, env) {
 
   return new Response(JSON.stringify({
     emails,
-    total: countResults.total,
+    total: countResult.total,
     page,
     limit,
-    totalPages: Math.ceil(countResults.total / limit),
+    totalPages: Math.ceil(countResult.total / limit),
     utmSources
   }), {
     headers: { 'content-type': 'application/json' },
@@ -2209,6 +2209,19 @@ Thanks for joining..."></textarea>
         </div>
     </div>
 
+    <!-- Tag Picker Modal -->
+    <div class="modal" id="tag-picker-modal" onclick="if(event.target===this)closeTagPickerModal()">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2 style="margin-bottom: 0.75rem;">Add Tag</h2>
+            <input type="text" id="tag-picker-search" placeholder="Search tags..." style="width: 100%; margin-bottom: 1rem;" oninput="filterTagPicker(this.value)">
+            <div id="tag-picker-list" style="display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px;"></div>
+            <p id="tag-picker-empty" style="display:none; color: var(--color-text-muted); font-size: 0.875rem; margin-top: 0.5rem;">No matching tags. Create tags in Manage Tags first.</p>
+            <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+                <button class="btn btn-outline" onclick="closeTagPickerModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Export Modal -->
     <div class="modal" id="export-modal">
         <div class="modal-content">
@@ -2555,18 +2568,43 @@ Thanks for joining..."></textarea>
             loadAll();
         }
 
+        let tagPickerEmailId = null;
+
         function openTagModal(emailId) {
-            // Simple prompt for now
-            const tagName = prompt('Enter tag name:');
-            if (!tagName) return;
-            
-            const tag = allTags.find(t => t.name === tagName);
-            if (!tag) {
-                showToast('Tag not found. Create it in Manage Tags first.');
-                return;
+            tagPickerEmailId = emailId;
+            document.getElementById('tag-picker-search').value = '';
+            filterTagPicker('');
+            document.getElementById('tag-picker-modal').classList.add('active');
+            setTimeout(() => document.getElementById('tag-picker-search').focus(), 50);
+        }
+
+        function closeTagPickerModal() {
+            document.getElementById('tag-picker-modal').classList.remove('active');
+            tagPickerEmailId = null;
+        }
+
+        function filterTagPicker(query) {
+            const lower = query.toLowerCase();
+            const filtered = allTags.filter(t => t.name.toLowerCase().includes(lower));
+            const list = document.getElementById('tag-picker-list');
+            const empty = document.getElementById('tag-picker-empty');
+            if (filtered.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+            } else {
+                empty.style.display = 'none';
+                list.innerHTML = filtered.map(t => \`
+                    <button onclick="pickTag('\${t.id}')" style="background:\${t.color}; color:#fff; border:none; border-radius:20px; padding:6px 14px; cursor:pointer; font-size:0.875rem; font-weight:500;">
+                        \${t.name}
+                    </button>
+                \`).join('');
             }
-            
-            addTagToEmail(emailId, tag.id);
+        }
+
+        async function pickTag(tagId) {
+            if (!tagPickerEmailId) return;
+            closeTagPickerModal();
+            await addTagToEmail(tagPickerEmailId, tagId);
         }
 
         async function addTagToEmail(emailId, tagId) {
