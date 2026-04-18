@@ -841,15 +841,15 @@ function getWebsiteHTML() {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlowCraft | Find Your Focus with ADHD</title>
     <meta name="description" content="FlowCraft is the ongoing practice of designing, testing, and refining the conditions for your own focus. Join the waitlist for group coaching and exclusive app access.">
-    
+    <link rel="icon" type="image/png" href="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/favicon.png">
     <style>
         :root {
             --color-bg: #F9FAFB;
             --color-surface: #FFFFFF;
             --color-primary: #0F4C5C;
             --color-primary-dark: #09303b;
-            --color-accent: #E36414;
-            --color-accent-hover: #C5530D;
+            --color-accent: #FF9A2F;
+            --color-accent-hover: #F08020;
             --color-text-main: #2D3748;
             --color-text-muted: #718096;
             --color-border: #E2E8F0;
@@ -1094,11 +1094,12 @@ function getWebsiteHTML() {
         }
 
         .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
             transition: opacity 0.6s ease-out, transform 0.6s ease-out;
         }
-        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .fade-in.animate-hidden {
+            opacity: 0;
+            transform: translateY(20px);
+        }
 
         #waitlist-message { margin-top: 1rem; font-weight: 500; }
         #waitlist-message.success { color: #38A169; }
@@ -1110,8 +1111,7 @@ function getWebsiteHTML() {
         <div class="container">
             <nav>
                 <a href="#" class="logo">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                    FlowCraft
+                    <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" height="16">
                 </a>
                 <div class="nav-links">
                     <a href="#story">The Story</a>
@@ -1163,7 +1163,7 @@ function getWebsiteHTML() {
                         <p class="serif">"I was already doing FlowCraft. I just didn't have a name for it yet."</p>
                     </div>
                     <div class="story-img fade-in">
-                        <img src="https://picsum.photos/seed/unicycle/600/500" alt="Abstract representation of movement and focus" loading="lazy">
+                        <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/Unicycle3.jpg" alt="Abstract representation of movement and focus" loading="lazy">
                     </div>
                 </div>
             </div>
@@ -1173,7 +1173,7 @@ function getWebsiteHTML() {
             <div class="container">
                 <div class="grid grid-2">
                     <div class="story-img fade-in" style="order: 2;">
-                        <img src="https://picsum.photos/seed/coffeebook/600/500" alt="A quiet moment of realization" loading="lazy">
+                        <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/Contact-Juggling-Cropped.jpg" alt="A quiet moment of realization" loading="lazy">
                     </div>
                     <div class="fade-in" style="order: 1;">
                         <h2>It wasn't luck. It was a structure.</h2>
@@ -1323,7 +1323,9 @@ function getWebsiteHTML() {
 
     <footer>
         <div class="container">
-            <div class="logo" style="justify-content: center; margin-bottom: 1rem;">FlowCraft</div>
+            <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
+                <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" height="14">
+            </div>
             <p>&copy; 2023 FlowCraft. All rights reserved.</p>
             <p style="font-size: 0.875rem;">
                 <a href="#">Privacy Policy</a> &middot; <a href="#">Terms of Service</a>
@@ -1333,16 +1335,27 @@ function getWebsiteHTML() {
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Mark below-fold elements as hidden so they can animate in on scroll.
+            // Above-fold elements are left visible immediately.
+            const belowFold = [];
+            document.querySelectorAll('.fade-in').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top > window.innerHeight) {
+                    el.classList.add('animate-hidden');
+                    belowFold.push(el);
+                }
+            });
+
             const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
+                        entry.target.classList.remove('animate-hidden');
                         observer.unobserve(entry.target);
                     }
                 });
             }, observerOptions);
-            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+            belowFold.forEach(el => observer.observe(el));
 
             const form = document.getElementById('waitlist-form');
             const messageEl = document.getElementById('waitlist-message');
@@ -1381,9 +1394,7 @@ function getWebsiteHTML() {
                         const data = await res.json();
 
                         if (res.ok) {
-                            messageEl.textContent = '🎉 Thanks for joining! We\'ll be in touch soon.';
-                            messageEl.className = 'success';
-                            document.getElementById('waitlist-email').value = '';
+                            window.location.href = '/thank-you';
                         } else {
                             messageEl.textContent = data.error || 'Something went wrong. Please try again.';
                             messageEl.className = 'error';
@@ -1414,8 +1425,8 @@ function getAdminHTML() {
             --color-surface: #FFFFFF;
             --color-primary: #0F4C5C;
             --color-primary-dark: #09303b;
-            --color-accent: #E36414;
-            --color-accent-hover: #C5530D;
+            --color-accent: #FF9A2F;
+            --color-accent-hover: #F08020;
             --color-text-main: #2D3748;
             --color-text-muted: #718096;
             --color-border: #E2E8F0;
