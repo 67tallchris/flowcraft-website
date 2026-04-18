@@ -2213,7 +2213,7 @@ Thanks for joining..."></textarea>
     <div class="modal" id="tag-picker-modal" onclick="if(event.target===this)closeTagPickerModal()">
         <div class="modal-content" style="max-width: 400px;">
             <h2 style="margin-bottom: 0.75rem;">Add Tag</h2>
-            <input type="text" id="tag-picker-search" placeholder="Search tags..." style="width: 100%; margin-bottom: 1rem;" oninput="filterTagPicker(this.value)">
+            <input type="text" id="tag-picker-search" placeholder="Search or type a new tag, then press Enter..." style="width: 100%; margin-bottom: 1rem;" oninput="filterTagPicker(this.value)" onkeydown="if(event.key==='Enter')createAndPickTag(this.value.trim())">
             <div id="tag-picker-list" style="display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px;"></div>
             <p id="tag-picker-empty" style="display:none; color: var(--color-text-muted); font-size: 0.875rem; margin-top: 0.5rem;">No matching tags. Create tags in Manage Tags first.</p>
             <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
@@ -2605,6 +2605,26 @@ Thanks for joining..."></textarea>
             if (!tagPickerEmailId) return;
             closeTagPickerModal();
             await addTagToEmail(tagPickerEmailId, tagId);
+        }
+
+        async function createAndPickTag(name) {
+            if (!name || !tagPickerEmailId) return;
+            const existing = allTags.find(t => t.name.toLowerCase() === name.toLowerCase());
+            if (existing) {
+                closeTagPickerModal();
+                await addTagToEmail(tagPickerEmailId, existing.id);
+                return;
+            }
+            const res = await fetch('/api/tags', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name })
+            });
+            const data = await res.json();
+            if (data.error) { showToast(data.error); return; }
+            allTags.push(data.tag);
+            closeTagPickerModal();
+            await addTagToEmail(tagPickerEmailId, data.tag.id);
         }
 
         async function addTagToEmail(emailId, tagId) {
