@@ -286,7 +286,7 @@ function getEmailWrapperHTML(content) {
   <div style="max-width: 500px; margin: 0 auto; background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
     ${content}
     <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #E2E8F0;">
-      <p style="color: #718096; font-size: 14px; margin: 0;">— The FlowCraft Team</p>
+      <p style="color: #718096; font-size: 14px; margin: 0;">The FlowCraft Team</p>
       <p style="color: #A0AEC0; font-size: 12px; margin-top: 8px;"><a href="https://flowcraft-website.portercoaching.workers.dev/" style="color: #A0AEC0; text-decoration: none;">flowcraft-website.portercoaching.workers.dev</a></p>
     </div>
   </div>
@@ -351,7 +351,7 @@ function getConfirmationEmailHTML() {
     <p style="color: #718096; font-size: 14px; margin-top: 24px;">In the meantime, start noticing when you're focused and when you're not. That's the first step of the FlowCraft Loop: <strong>Observe → Experiment → Measure → Adjust</strong>.</p>
     
     <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #E2E8F0;">
-      <p style="color: #718096; font-size: 14px; margin: 0;">— The FlowCraft Team</p>
+      <p style="color: #718096; font-size: 14px; margin: 0;">The FlowCraft Team</p>
       <p style="color: #A0AEC0; font-size: 12px; margin-top: 8px;"><a href="https://flowcraft-website.portercoaching.workers.dev/" style="color: #A0AEC0; text-decoration: none;">flowcraft-website.portercoaching.workers.dev</a></p>
     </div>
   </div>
@@ -1125,7 +1125,7 @@ function getWebsiteHTML() {
         <div class="container">
             <nav>
                 <a href="#" class="logo">
-                    <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" style="height: 40px; width: auto; display: inline;">
+                    <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/FlowCrafft-Logo-larger.png" alt="FlowCraft" style="height: 40px; width: auto; display: inline;">
                 </a>
                 <div class="nav-links">
                     <a href="#story">The Story</a>
@@ -1171,7 +1171,7 @@ function getWebsiteHTML() {
                 <div class="grid grid-2">
                     <div class="fade-in">
                         <h2>I didn't have a name for it yet.</h2>
-                        <p>If you had walked past the right grassy area in community college, you might have spotted me — backpack on the ground, juggling balls in the air, completely in my own world.</p>
+                        <p>If you had walked past the right grassy area in community college, you might have spotted me, backpack on the ground, juggling balls in the air, completely in my own world.</p>
                         <p>I thought I was just being weird. But if I didn't move my body and do something that demanded my full attention, I couldn't sit still and focus when I got back to class.</p>
                         <p><strong>I was spiking my dopamine.</strong> Moving my body boosts the neurotransmitters my ADHD brain was starving for. And juggling? It demands complete attention. There is no room for mental noise when you're trying to keep three balls in the air.</p>
                         <p class="serif">"I was already doing FlowCraft. I just didn't have a name for it yet."</p>
@@ -1194,7 +1194,7 @@ function getWebsiteHTML() {
                         <p>Working the afternoon shift at a Starbucks in Tucson, a customer handed me a book: <em>Flow</em> by Mihaly Csikszentmihalyi.</p>
                         <p>He explained that there is a specific state of consciousness where you become completely absorbed in what you're doing. Time distorts. Self-consciousness disappears.</p>
                         <p>It's not random. It has identifiable conditions. You can learn to create them.</p>
-                        <p>That planted the idea that focus wasn't something that happened to you — it was something you could learn to find. On purpose.</p>
+                        <p>That planted the idea that focus wasn't something that happened to you; it was something you could learn to find. On purpose.</p>
                     </div>
                 </div>
             </div>
@@ -1221,7 +1221,7 @@ function getWebsiteHTML() {
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                     </div>
                     <h3>2. Testing</h3>
-                    <p>FlowCraft is empirical. You form a hypothesis — what if I work in shorter bursts? — and then you run the experiment. You're not failing if it doesn't work; you're learning.</p>
+                    <p>FlowCraft is empirical. You form a hypothesis: what if I work in shorter bursts? And then you run the experiment. You're not failing if it doesn't work; you're learning.</p>
                 </div>
                 <div class="card">
                     <div class="icon-box">
@@ -1338,7 +1338,7 @@ function getWebsiteHTML() {
     <footer>
         <div class="container">
             <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
-                <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/logo.png" alt="FlowCraft" style="height: 40px; width: auto; display: inline;">
+                <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/FlowCrafft-Logo-larger.png" alt="FlowCraft" style="height: 40px; width: auto; display: inline;">
             </div>
             <p>&copy; 2026 FlowCraft. All rights reserved.</p>
             <p style="font-size: 0.875rem;">
@@ -1432,7 +1432,7 @@ function getPrivacyHTML() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy — FlowCraft</title>
+  <title>Privacy Policy | FlowCraft</title>
   <style>
     body { font-family: Georgia, serif; max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; color: #222; line-height: 1.8; }
     h1 { font-size: 2rem; margin-bottom: 0.25rem; }
@@ -1475,8 +1475,8 @@ function getPrivacyHTML() {
   <h2>5. Third-Party Services</h2>
   <p>We use the following third-party services, each with their own privacy policies:</p>
   <ul>
-    <li><strong>Cloudflare</strong> — hosting and infrastructure</li>
-    <li><strong>Resend</strong> — transactional email delivery</li>
+    <li><strong>Cloudflare</strong>: hosting and infrastructure</li>
+    <li><strong>Resend</strong>: transactional email delivery</li>
   </ul>
 
   <h2>6. Cookies</h2>
@@ -1503,7 +1503,7 @@ function getTermsHTML() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Terms of Service — FlowCraft</title>
+  <title>Terms of Service | FlowCraft</title>
   <style>
     body { font-family: Georgia, serif; max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; color: #222; line-height: 1.8; }
     h1 { font-size: 2rem; margin-bottom: 0.25rem; }
@@ -1538,7 +1538,7 @@ function getTermsHTML() {
   <p>Joining our waitlist does not guarantee access to FlowCraft or any specific product or service. We reserve the right to determine how and when access is granted. We may contact waitlist members via the email address provided.</p>
 
   <h2>4. Intellectual Property</h2>
-  <p>All content on this site — including text, graphics, logos, and design — is the property of FlowCraft and is protected by applicable intellectual property laws. You may not reproduce or distribute any content without our express written permission.</p>
+  <p>All content on this site, including text, graphics, logos, and design, is the property of FlowCraft and is protected by applicable intellectual property laws. You may not reproduce or distribute any content without our express written permission.</p>
 
   <h2>5. Disclaimer of Warranties</h2>
   <p>This site is provided "as is" without warranties of any kind, either express or implied. We do not warrant that the site will be error-free, uninterrupted, or free of harmful components.</p>
@@ -2162,7 +2162,7 @@ function getAdminHTML() {
                                     <div style="margin-bottom: 1rem;">
                                         <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: 500;">
                                             Email Body (Markdown)
-                                            <span style="color: var(--color-text-muted); font-weight: 400; font-size: 0.75rem;">— supports # headings, **bold**, *italic*, > quotes, - lists, --- dividers</span>
+                                            <span style="color: var(--color-text-muted); font-weight: 400; font-size: 0.75rem;">Supports # headings, **bold**, *italic*, > quotes, - lists, --- dividers</span>
                                         </label>
                                         <textarea id="template-body" style="width: 100%; min-height: 400px; font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 13px; line-height: 1.6; padding: 12px; border: 1px solid var(--color-border); border-radius: 6px; resize: vertical;" placeholder="# Welcome!
 
@@ -2188,7 +2188,7 @@ Thanks for joining..."></textarea>
                                                 <p style="color: var(--color-text-muted); text-align: center; padding: 40px 0;">Click "Preview" to see how your email will look</p>
                                             </div>
                                             <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #E2E8F0;">
-                                                <p style="color: #718096; font-size: 12px; margin: 0;">— The FlowCraft Team</p>
+                                                <p style="color: #718096; font-size: 12px; margin: 0;">The FlowCraft Team</p>
                                             </div>
                                         </div>
                                     </div>
