@@ -870,7 +870,7 @@ function getCMSHTML() {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FlowCraft CMS</title>
-  <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
+  <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
 </head>
 <body></body>
 </html>`;
@@ -883,6 +883,7 @@ function getCMSConfig() {
   repo: 67tallchris/flowcraft-website
   branch: main
   base_url: https://sveltia-cms-auth.portercoaching.workers.dev
+  auth_scope: repo
 
 media_folder: ""
 public_folder: ""
