@@ -1,3 +1,5 @@
+import content from '../content/site.json';
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -85,6 +87,20 @@ export default {
     if (pathname === '/admin') {
       return new Response(getAdminHTML(), {
         headers: { 'content-type': 'text/html;charset=UTF-8' },
+      });
+    }
+
+    // CMS Admin UI
+    if (pathname === '/cms' || pathname === '/cms/') {
+      return new Response(getCMSHTML(), {
+        headers: { 'content-type': 'text/html;charset=UTF-8' },
+      });
+    }
+
+    // CMS Config
+    if (pathname === '/cms/config.yml') {
+      return new Response(getCMSConfig(), {
+        headers: { 'content-type': 'text/yaml;charset=UTF-8' },
       });
     }
 
@@ -846,6 +862,168 @@ function simpleMarkdownToHTML(md) {
   return html;
 }
 
+// CMS Admin UI
+function getCMSHTML() {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlowCraft CMS</title>
+  <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
+</head>
+<body></body>
+</html>`;
+}
+
+// CMS Config
+function getCMSConfig() {
+  return `backend:
+  name: github
+  repo: 67tallchris/flowcraft-website
+  branch: main
+  base_url: https://sveltia-cms-auth.portercoaching.workers.dev
+
+media_folder: ""
+public_folder: ""
+
+collections:
+  - name: site
+    label: Site Content
+    files:
+      - name: content
+        label: All Content
+        file: content/site.json
+        fields:
+          - label: Page Title
+            name: meta.title
+            widget: string
+          - label: Meta Description
+            name: meta.description
+            widget: text
+          - label: "Hero: Headline"
+            name: hero.headline
+            widget: string
+          - label: "Hero: Lead Paragraph"
+            name: hero.lead
+            widget: text
+          - label: "Hero: Button Text"
+            name: hero.buttonText
+            widget: string
+          - label: "Hero: Subtext"
+            name: hero.subtext
+            widget: string
+          - label: "Quote: Text"
+            name: quote.text
+            widget: string
+          - label: "Quote: Attribution"
+            name: quote.attribution
+            widget: string
+          - label: "Story 1: Heading"
+            name: story1.heading
+            widget: string
+          - label: "Story 1: Paragraph 1"
+            name: story1.paragraph1
+            widget: text
+          - label: "Story 1: Paragraph 2"
+            name: story1.paragraph2
+            widget: text
+          - label: "Story 1: Paragraph 3"
+            name: story1.paragraph3
+            widget: text
+          - label: "Story 1: Pull Quote"
+            name: story1.pullQuote
+            widget: string
+          - label: "Story 2: Heading"
+            name: story2.heading
+            widget: string
+          - label: "Story 2: Paragraph 1"
+            name: story2.paragraph1
+            widget: text
+          - label: "Story 2: Paragraph 2"
+            name: story2.paragraph2
+            widget: text
+          - label: "Story 2: Paragraph 3"
+            name: story2.paragraph3
+            widget: text
+          - label: "Story 2: Paragraph 4"
+            name: story2.paragraph4
+            widget: text
+          - label: "Framework: Heading"
+            name: framework.heading
+            widget: string
+          - label: "Framework: Lead"
+            name: framework.lead
+            widget: text
+          - label: "Framework: Cards"
+            name: framework.cards
+            widget: list
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Body, name: body, widget: text }
+          - label: "Loop: Heading"
+            name: loop.heading
+            widget: string
+          - label: "Loop: Lead"
+            name: loop.lead
+            widget: string
+          - label: "Loop: Steps"
+            name: loop.steps
+            widget: list
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Body, name: body, widget: text }
+          - label: "App: Label"
+            name: app.label
+            widget: string
+          - label: "App: Heading"
+            name: app.heading
+            widget: string
+          - label: "App: Body"
+            name: app.body
+            widget: text
+          - label: "App: Checklist"
+            name: app.checklist
+            widget: list
+          - label: "App: CTA Button Text"
+            name: app.ctaText
+            widget: string
+          - label: "App: Demo Link Text"
+            name: app.demoText
+            widget: string
+          - label: "Shift: Heading"
+            name: shift.heading
+            widget: string
+          - label: "Shift: Intro"
+            name: shift.intro
+            widget: string
+          - label: "Shift: Quote 1"
+            name: shift.quote1
+            widget: string
+          - label: "Shift: Bridge"
+            name: shift.bridge
+            widget: string
+          - label: "Shift: Quote 2"
+            name: shift.quote2
+            widget: string
+          - label: "Shift: Closing"
+            name: shift.closing
+            widget: text
+          - label: "Final CTA: Heading"
+            name: finalCta.heading
+            widget: string
+          - label: "Final CTA: Lead"
+            name: finalCta.lead
+            widget: string
+          - label: "Final CTA: Button Text"
+            name: finalCta.buttonText
+            widget: string
+          - label: "Footer: Copyright"
+            name: footer.copyright
+            widget: string
+`;
+}
+
 // Get website HTML
 function getWebsiteHTML() {
   return `<!DOCTYPE html>
@@ -853,8 +1031,8 @@ function getWebsiteHTML() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlowCraft | Find Your Focus with ADHD</title>
-    <meta name="description" content="FlowCraft is the ongoing practice of designing, testing, and refining the conditions for your own focus. Join the waitlist for group coaching and exclusive app access.">
+    <title>${content.meta.title}</title>
+    <meta name="description" content="${content.meta.description}">
     <link rel="icon" type="image/png" href="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/favicon.png">
     <style>
         :root {
@@ -1140,18 +1318,18 @@ function getWebsiteHTML() {
     <main>
         <section class="hero">
             <div class="container text-center fade-in">
-                <h1 class="mb-md">No one taught you how to find your focus.</h1>
+                <h1 class="mb-md">${content.hero.headline}</h1>
                 <p class="lead" style="max-width: 700px; margin: 0 auto 2rem;">
-                    Every productivity system you've tried promises to get you into flow consistently. And none of them reliably do. It's time to stop fixing yourself and start designing for your brain.
+                    ${content.hero.lead}
                 </p>
                 <div id="waitlist" style="scroll-margin-top: 100px;">
                     <form id="waitlist-form" class="input-group">
                         <input type="email" id="waitlist-email" placeholder="Enter your email address" required aria-label="Email Address">
-                        <button type="submit" class="btn btn-primary">Join the Waitlist</button>
+                        <button type="submit" class="btn btn-primary">${content.hero.buttonText}</button>
                     </form>
                     <div id="waitlist-message"></div>
                     <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-top: 1rem;">
-                        Get notified about the next group coaching session + exclusive app access.
+                        ${content.hero.subtext}
                     </p>
                 </div>
             </div>
@@ -1160,8 +1338,8 @@ function getWebsiteHTML() {
         <section class="section">
             <div class="container">
                 <div class="quote-box fade-in">
-                    <p>"You try the system, it works for a few days, maybe a week, and then it falls apart. Is it the system? Or is it me?"</p>
-                    <span>The Maddening Part</span>
+                    <p>${content.quote.text}</p>
+                    <span>${content.quote.attribution}</span>
                 </div>
             </div>
         </section>
@@ -1170,11 +1348,11 @@ function getWebsiteHTML() {
             <div class="container">
                 <div class="grid grid-2">
                     <div class="fade-in">
-                        <h2>I didn't have a name for it yet.</h2>
-                        <p>If you had walked past the right grassy area in community college, you might have spotted me, backpack on the ground, juggling balls in the air, completely in my own world.</p>
-                        <p>I thought I was just being weird. But if I didn't move my body and do something that demanded my full attention, I couldn't sit still and focus when I got back to class.</p>
-                        <p><strong>I was spiking my dopamine.</strong> Moving my body boosts the neurotransmitters my ADHD brain was starving for. And juggling? It demands complete attention. There is no room for mental noise when you're trying to keep three balls in the air.</p>
-                        <p class="serif">"I was already doing FlowCraft. I just didn't have a name for it yet."</p>
+                        <h2>${content.story1.heading}</h2>
+                        <p>${content.story1.paragraph1}</p>
+                        <p>${content.story1.paragraph2}</p>
+                        <p>${content.story1.paragraph3}</p>
+                        <p class="serif">${content.story1.pullQuote}</p>
                     </div>
                     <div class="story-img fade-in">
                         <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/Unicycle3.jpg" alt="Abstract representation of movement and focus" loading="lazy">
@@ -1190,11 +1368,11 @@ function getWebsiteHTML() {
                         <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/Contact-Juggling-Cropped.jpg" alt="A quiet moment of realization" loading="lazy">
                     </div>
                     <div class="fade-in" style="order: 1;">
-                        <h2>It wasn't luck. It was a structure.</h2>
-                        <p>Working the afternoon shift at a Starbucks in Tucson, a customer handed me a book: <em>Flow</em> by Mihaly Csikszentmihalyi.</p>
-                        <p>He explained that there is a specific state of consciousness where you become completely absorbed in what you're doing. Time distorts. Self-consciousness disappears.</p>
-                        <p>It's not random. It has identifiable conditions. You can learn to create them.</p>
-                        <p>That planted the idea that focus wasn't something that happened to you; it was something you could learn to find. On purpose.</p>
+                        <h2>${content.story2.heading}</h2>
+                        <p>${content.story2.paragraph1}</p>
+                        <p>${content.story2.paragraph2}</p>
+                        <p>${content.story2.paragraph3}</p>
+                        <p>${content.story2.paragraph4}</p>
                     </div>
                 </div>
             </div>
@@ -1202,9 +1380,9 @@ function getWebsiteHTML() {
 
         <section id="framework" class="section">
             <div class="container text-center mb-lg fade-in">
-                <h2>So, what is FlowCraft?</h2>
+                <h2>${content.framework.heading}</h2>
                 <p class="lead" style="max-width: 800px; margin: 0 auto;">
-                    FlowCraft is the ongoing practice of designing, testing, and refining the conditions for your own focus.
+                    ${content.framework.lead}
                 </p>
             </div>
 
@@ -1213,30 +1391,30 @@ function getWebsiteHTML() {
                     <div class="icon-box">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
                     </div>
-                    <h3>1. Designing</h3>
-                    <p>Not following. Not copying. <strong>Designing.</strong> When I rode that unicycle, I was designing a pre-focus ritual for my specific brain. You are not going to find your version of this in a productivity book.</p>
+                    <h3>${content.framework.cards[0].title}</h3>
+                    <p>${content.framework.cards[0].body}</p>
                 </div>
                 <div class="card">
                     <div class="icon-box">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                     </div>
-                    <h3>2. Testing</h3>
-                    <p>FlowCraft is empirical. You form a hypothesis: what if I work in shorter bursts? And then you run the experiment. You're not failing if it doesn't work; you're learning.</p>
+                    <h3>${content.framework.cards[1].title}</h3>
+                    <p>${content.framework.cards[1].body}</p>
                 </div>
                 <div class="card">
                     <div class="icon-box">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </div>
-                    <h3>3. Refining</h3>
-                    <p>Most systems assume that once you find the right system, you're done. That's not how life works, and it's not how ADHD works. You refine continuously as your life changes.</p>
+                    <h3>${content.framework.cards[2].title}</h3>
+                    <p>${content.framework.cards[2].body}</p>
                 </div>
             </div>
         </section>
 
         <section class="section">
             <div class="container fade-in">
-                <h2 class="text-center">The FlowCraft Loop</h2>
-                <p class="text-center lead mb-lg">At the heart of FlowCraft is a simple loop.</p>
+                <h2 class="text-center">${content.loop.heading}</h2>
+                <p class="text-center lead mb-lg">${content.loop.lead}</p>
 
                 <div style="display: flex; justify-content: center; margin-bottom: 2.5rem;">
                     <video autoplay loop muted playsinline style="max-width: 100%; width: 640px; border-radius: 12px;">
@@ -1250,29 +1428,29 @@ function getWebsiteHTML() {
                             <div class="icon-box" style="margin: 0 auto 1rem;">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                             </div>
-                            <h3>Observe</h3>
-                            <p>Pay attention to when you're focused and when you're not. Gather data about yourself without judgment.</p>
+                            <h3>${content.loop.steps[0].title}</h3>
+                            <p>${content.loop.steps[0].body}</p>
                         </div>
                         <div class="step">
                             <div class="icon-box" style="margin: 0 auto 1rem;">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                             </div>
-                            <h3>Experiment</h3>
-                            <p>Deliberately introduce changes. New environments, timing, rituals. Treat it like a hypothesis, not a commitment.</p>
+                            <h3>${content.loop.steps[1].title}</h3>
+                            <p>${content.loop.steps[1].body}</p>
                         </div>
                         <div class="step">
                             <div class="icon-box" style="margin: 0 auto 1rem;">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                             </div>
-                            <h3>Measure</h3>
-                            <p>Track results and the <strong>felt experience</strong>. Did it work? Did time disappear? Both tracks of data are real.</p>
+                            <h3>${content.loop.steps[2].title}</h3>
+                            <p>${content.loop.steps[2].body}</p>
                         </div>
                         <div class="step">
                             <div class="icon-box" style="margin: 0 auto 1rem;">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                             </div>
-                            <h3>Adjust</h3>
-                            <p>Take what you learned and modify. Keep what works. Drop what doesn't. Then observe again.</p>
+                            <h3>${content.loop.steps[3].title}</h3>
+                            <p>${content.loop.steps[3].body}</p>
                         </div>
                     </div>
                 </div>
@@ -1283,28 +1461,21 @@ function getWebsiteHTML() {
             <div class="container">
                 <div class="app-teaser fade-in">
                     <div class="app-content">
-                        <span style="color: var(--color-accent); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 0.875rem;">The Tool & The Team</span>
-                        <h2 style="color: white; margin-top: 0.5rem;">You don't have to do this alone.</h2>
+                        <span style="color: var(--color-accent); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 0.875rem;">${content.app.label}</span>
+                        <h2 style="color: white; margin-top: 0.5rem;">${content.app.heading}</h2>
                         <p style="color: #CBD5E0; margin-bottom: 1.5rem;">
-                            FlowCraft is not a system I can hand you, but I can coach you through the process. I've built a webapp to support your practice, and I'm launching a group coaching cohort to guide you through the loop.
+                            ${content.app.body}
                         </p>
                         <ul style="list-style: none; margin-bottom: 2rem; color: #CBD5E0;">
+                            ${content.app.checklist.map(item => `
                             <li style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 10px;">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E36414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                Exclusive access to the FlowCraft Webapp
-                            </li>
-                            <li style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 10px;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E36414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                Group coaching sessions
-                            </li>
-                            <li style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 10px;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E36414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                A community of ADHD knowledge workers
-                            </li>
+                                ${item}
+                            </li>`).join('')}
                         </ul>
-                        <a href="#waitlist" class="btn btn-primary">Join the Waitlist</a>
+                        <a href="#waitlist" class="btn btn-primary">${content.app.ctaText}</a>
                         <div style="margin-top: 1rem;">
-                            <a href="https://adhd-productivity.portercoaching.workers.dev/" target="_blank" style="color: white; text-decoration: underline; font-size: 0.9rem;">Or preview the Webapp demo &rarr;</a>
+                            <a href="https://adhd-productivity.portercoaching.workers.dev/" target="_blank" style="color: white; text-decoration: underline; font-size: 0.9rem;">${content.app.demoText}</a>
                         </div>
                     </div>
                     <div class="app-visual">
@@ -1316,26 +1487,26 @@ function getWebsiteHTML() {
 
         <section class="section text-center">
             <div class="container fade-in" style="max-width: 800px;">
-                <h2>A Shift in the Question</h2>
-                <p class="lead mb-md">Most of us with ADHD have spent years asking:</p>
-                <p class="serif" style="font-size: 1.5rem; margin-bottom: 2rem;">"Why can't I just do what other people seem to do?"</p>
-                <p class="lead mb-md">FlowCraft asks a different question:</p>
+                <h2>${content.shift.heading}</h2>
+                <p class="lead mb-md">${content.shift.intro}</p>
+                <p class="serif" style="font-size: 1.5rem; margin-bottom: 2rem;">${content.shift.quote1}</p>
+                <p class="lead mb-md">${content.shift.bridge}</p>
                 <div class="card" style="border-left: 4px solid var(--color-accent);">
-                    <p class="serif" style="font-size: 1.5rem; margin-bottom: 0; color: var(--color-primary-dark);">"What conditions make it more possible for my brain to function well?"</p>
+                    <p class="serif" style="font-size: 1.5rem; margin-bottom: 0; color: var(--color-primary-dark);">${content.shift.quote2}</p>
                 </div>
                 <p style="margin-top: 2rem;">
-                    You're not measuring yourself against a neurotypical standard. You're trying to understand a system. <strong>Your system.</strong>
+                    ${content.shift.closing}
                 </p>
             </div>
         </section>
 
         <section class="section" style="background-color: #F0F4F8;">
             <div class="container text-center fade-in">
-                <h2 class="mb-md">Ready to find your flow?</h2>
-                <p class="lead mb-lg">Join the waitlist to be the first to know when coaching enrollment opens.</p>
+                <h2 class="mb-md">${content.finalCta.heading}</h2>
+                <p class="lead mb-lg">${content.finalCta.lead}</p>
                 <form class="input-group" onsubmit="event.preventDefault(); document.getElementById('waitlist-email').value && document.getElementById('waitlist-form').dispatchEvent(new Event('submit', {cancelable: true}));">
                     <input type="email" placeholder="Enter your email address" required aria-label="Email Address" form="waitlist-form">
-                    <button type="submit" class="btn btn-primary" form="waitlist-form">Get Early Access</button>
+                    <button type="submit" class="btn btn-primary" form="waitlist-form">${content.finalCta.buttonText}</button>
                 </form>
             </div>
         </section>
@@ -1346,7 +1517,7 @@ function getWebsiteHTML() {
             <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
                 <img src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/FlowCrafft-Logo-larger.png" alt="FlowCraft" style="height: 40px; width: auto; display: inline;">
             </div>
-            <p>&copy; 2026 FlowCraft. All rights reserved.</p>
+            <p>${content.footer.copyright}</p>
             <p style="font-size: 0.875rem;">
                 <a href="/privacy">Privacy Policy</a> &middot; <a href="/terms">Terms of Service</a>
             </p>

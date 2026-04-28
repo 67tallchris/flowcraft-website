@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "title": "FlowCraft | Find Your Focus with ADHD",
+    "description": "FlowCraft is the ongoing practice of designing, testing, and refining the conditions for your own focus. Join the waitlist for group coaching and exclusive app access."
+  },
+  "hero": {
+    "headline": "No one taught you how to find your focus.",
+    "lead": "Every productivity system you've tried promises to get you into flow consistently. And none of them reliably do. It's time to stop fixing yourself and start designing for your brain.",
+    "buttonText": "Join the Waitlist",
+    "subtext": "Get notified about the next group coaching session + exclusive app access."
+  },
+  "quote": {
+    "text": "\u201cYou try the system, it works for a few days, maybe a week, and then it falls apart. Is it the system? Or is it me?\u201d",
+    "attribution": "The Maddening Part"
+  },
+  "story1": {
+    "heading": "I didn\u2019t have a name for it yet.",
+    "paragraph1": "If you had walked past the right grassy area in community college, you might have spotted me, backpack on the ground, juggling balls in the air, completely in my own world.",
+    "paragraph2": "I thought I was just being weird. But if I didn\u2019t move my body and do something that demanded my full attention, I couldn\u2019t sit still and focus when I got back to class.",
+    "paragraph3": "<strong>I was spiking my dopamine.</strong> Moving my body boosts the neurotransmitters my ADHD brain was starving for. And juggling? It demands complete attention. There is no room for mental noise when you\u2019re trying to keep three balls in the air.",
+    "pullQuote": "\u201cI was already doing FlowCraft. I just didn\u2019t have a name for it yet.\u201d"
+  },
+  "story2": {
+    "heading": "It wasn\u2019t luck. It was a structure.",
+    "paragraph1": "Working the afternoon shift at a Starbucks in Tucson, a customer handed me a book: <em>Flow</em> by Mihaly Csikszentmihalyi.",
+    "paragraph2": "He explained that there is a specific state of consciousness where you become completely absorbed in what you\u2019re doing. Time distorts. Self-consciousness disappears.",
+    "paragraph3": "It\u2019s not random. It has identifiable conditions. You can learn to create them.",
+    "paragraph4": "That planted the idea that focus wasn\u2019t something that happened to you; it was something you could learn to find. On purpose."
+  },
+  "framework": {
+    "heading": "So, what is FlowCraft?",
+    "lead": "FlowCraft is the ongoing practice of designing, testing, and refining the conditions for your own focus.",
+    "cards": [
+      {
+        "title": "1. Designing",
+        "body": "Not following. Not copying. <strong>Designing.</strong> When I rode that unicycle, I was designing a pre-focus ritual for my specific brain. You are not going to find your version of this in a productivity book."
+      },
+      {
+        "title": "2. Testing",
+        "body": "FlowCraft is empirical. You form a hypothesis: what if I work in shorter bursts? And then you run the experiment. You\u2019re not failing if it doesn\u2019t work; you\u2019re learning."
+      },
+      {
+        "title": "3. Refining",
+        "body": "Most systems assume that once you find the right system, you\u2019re done. That\u2019s not how life works, and it\u2019s not how ADHD works. You refine continuously as your life changes."
+      }
+    ]
+  },
+  "loop": {
+    "heading": "The FlowCraft Loop",
+    "lead": "At the heart of FlowCraft is a simple loop.",
+    "steps": [
+      {
+        "title": "Observe",
+        "body": "Pay attention to when you\u2019re focused and when you\u2019re not. Gather data about yourself without judgment."
+      },
+      {
+        "title": "Experiment",
+        "body": "Deliberately introduce changes. New environments, timing, rituals. Treat it like a hypothesis, not a commitment."
+      },
+      {
+        "title": "Measure",
+        "body": "Track results and the <strong>felt experience</strong>. Did it work? Did time disappear? Both tracks of data are real."
+      },
+      {
+        "title": "Adjust",
+        "body": "Take what you learned and modify. Keep what works. Drop what doesn\u2019t. Then observe again."
+      }
+    ]
+  },
+  "app": {
+    "label": "The Tool & The Team",
+    "heading": "You don\u2019t have to do this alone.",
+    "body": "FlowCraft is not a system I can hand you, but I can coach you through the process. I\u2019ve built a webapp to support your practice, and I\u2019m launching a group coaching cohort to guide you through the loop.",
+    "checklist": [
+      "Exclusive access to the FlowCraft Webapp",
+      "Group coaching sessions",
+      "A community of ADHD knowledge workers"
+    ],
+    "ctaText": "Join the Waitlist",
+    "demoText": "Or preview the Webapp demo \u2192"
+  },
+  "shift": {
+    "heading": "A Shift in the Question",
+    "intro": "Most of us with ADHD have spent years asking:",
+    "quote1": "\u201cWhy can\u2019t I just do what other people seem to do?\u201d",
+    "bridge": "FlowCraft asks a different question:",
+    "quote2": "\u201cWhat conditions make it more possible for my brain to function well?\u201d",
+    "closing": "You\u2019re not measuring yourself against a neurotypical standard. You\u2019re trying to understand a system. <strong>Your system.</strong>"
+  },
+  "finalCta": {
+    "heading": "Ready to find your flow?",
+    "lead": "Join the waitlist to be the first to know when coaching enrollment opens.",
+    "buttonText": "Get Early Access"
+  },
+  "footer": {
+    "copyright": "\u00a9 2026 FlowCraft. All rights reserved."
+  }
+}
