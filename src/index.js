@@ -1237,7 +1237,13 @@ function getWebsiteHTML() {
             <div class="container fade-in">
                 <h2 class="text-center">The FlowCraft Loop</h2>
                 <p class="text-center lead mb-lg">At the heart of FlowCraft is a simple loop.</p>
-                
+
+                <div style="display: flex; justify-content: center; margin-bottom: 2.5rem;">
+                    <video autoplay loop muted playsinline style="max-width: 100%; width: 640px; border-radius: 12px;">
+                        <source src="https://pub-12f6d303b8dc4698be2adb7d80986978.r2.dev/flowcraft-loop-diagram.mp4" type="video/mp4">
+                    </video>
+                </div>
+
                 <div class="loop-container">
                     <div class="loop-steps">
                         <div class="step">
