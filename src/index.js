@@ -895,132 +895,100 @@ collections:
         label: All Content
         file: content/site.json
         fields:
-          - label: Page Title
-            name: meta.title
-            widget: string
-          - label: Meta Description
-            name: meta.description
-            widget: text
-          - label: "Hero: Headline"
-            name: hero.headline
-            widget: string
-          - label: "Hero: Lead Paragraph"
-            name: hero.lead
-            widget: text
-          - label: "Hero: Button Text"
-            name: hero.buttonText
-            widget: string
-          - label: "Hero: Subtext"
-            name: hero.subtext
-            widget: string
-          - label: "Quote: Text"
-            name: quote.text
-            widget: string
-          - label: "Quote: Attribution"
-            name: quote.attribution
-            widget: string
-          - label: "Story 1: Heading"
-            name: story1.heading
-            widget: string
-          - label: "Story 1: Paragraph 1"
-            name: story1.paragraph1
-            widget: text
-          - label: "Story 1: Paragraph 2"
-            name: story1.paragraph2
-            widget: text
-          - label: "Story 1: Paragraph 3"
-            name: story1.paragraph3
-            widget: text
-          - label: "Story 1: Pull Quote"
-            name: story1.pullQuote
-            widget: string
-          - label: "Story 2: Heading"
-            name: story2.heading
-            widget: string
-          - label: "Story 2: Paragraph 1"
-            name: story2.paragraph1
-            widget: text
-          - label: "Story 2: Paragraph 2"
-            name: story2.paragraph2
-            widget: text
-          - label: "Story 2: Paragraph 3"
-            name: story2.paragraph3
-            widget: text
-          - label: "Story 2: Paragraph 4"
-            name: story2.paragraph4
-            widget: text
-          - label: "Framework: Heading"
-            name: framework.heading
-            widget: string
-          - label: "Framework: Lead"
-            name: framework.lead
-            widget: text
-          - label: "Framework: Cards"
-            name: framework.cards
-            widget: list
+          - label: Meta
+            name: meta
+            widget: object
             fields:
-              - { label: Title, name: title, widget: string }
-              - { label: Body, name: body, widget: text }
-          - label: "Loop: Heading"
-            name: loop.heading
-            widget: string
-          - label: "Loop: Lead"
-            name: loop.lead
-            widget: string
-          - label: "Loop: Steps"
-            name: loop.steps
-            widget: list
+              - { label: Page Title, name: title, widget: string }
+              - { label: Meta Description, name: description, widget: text }
+          - label: Hero
+            name: hero
+            widget: object
             fields:
-              - { label: Title, name: title, widget: string }
+              - { label: Headline, name: headline, widget: string }
+              - { label: Lead Paragraph, name: lead, widget: text }
+              - { label: Button Text, name: buttonText, widget: string }
+              - { label: Subtext, name: subtext, widget: string }
+          - label: Quote
+            name: quote
+            widget: object
+            fields:
+              - { label: Text, name: text, widget: string }
+              - { label: Attribution, name: attribution, widget: string }
+          - label: Story 1
+            name: story1
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: string }
+              - { label: Paragraph 1, name: paragraph1, widget: text }
+              - { label: Paragraph 2, name: paragraph2, widget: text }
+              - { label: Paragraph 3, name: paragraph3, widget: text }
+              - { label: Pull Quote, name: pullQuote, widget: string }
+          - label: Story 2
+            name: story2
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: string }
+              - { label: Paragraph 1, name: paragraph1, widget: text }
+              - { label: Paragraph 2, name: paragraph2, widget: text }
+              - { label: Paragraph 3, name: paragraph3, widget: text }
+              - { label: Paragraph 4, name: paragraph4, widget: text }
+          - label: Framework
+            name: framework
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: string }
+              - { label: Lead, name: lead, widget: text }
+              - label: Cards
+                name: cards
+                widget: list
+                fields:
+                  - { label: Title, name: title, widget: string }
+                  - { label: Body, name: body, widget: text }
+          - label: Loop
+            name: loop
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: string }
+              - { label: Lead, name: lead, widget: string }
+              - label: Steps
+                name: steps
+                widget: list
+                fields:
+                  - { label: Title, name: title, widget: string }
+                  - { label: Body, name: body, widget: text }
+          - label: App Section
+            name: app
+            widget: object
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: Heading, name: heading, widget: string }
               - { label: Body, name: body, widget: text }
-          - label: "App: Label"
-            name: app.label
-            widget: string
-          - label: "App: Heading"
-            name: app.heading
-            widget: string
-          - label: "App: Body"
-            name: app.body
-            widget: text
-          - label: "App: Checklist"
-            name: app.checklist
-            widget: list
-          - label: "App: CTA Button Text"
-            name: app.ctaText
-            widget: string
-          - label: "App: Demo Link Text"
-            name: app.demoText
-            widget: string
-          - label: "Shift: Heading"
-            name: shift.heading
-            widget: string
-          - label: "Shift: Intro"
-            name: shift.intro
-            widget: string
-          - label: "Shift: Quote 1"
-            name: shift.quote1
-            widget: string
-          - label: "Shift: Bridge"
-            name: shift.bridge
-            widget: string
-          - label: "Shift: Quote 2"
-            name: shift.quote2
-            widget: string
-          - label: "Shift: Closing"
-            name: shift.closing
-            widget: text
-          - label: "Final CTA: Heading"
-            name: finalCta.heading
-            widget: string
-          - label: "Final CTA: Lead"
-            name: finalCta.lead
-            widget: string
-          - label: "Final CTA: Button Text"
-            name: finalCta.buttonText
-            widget: string
-          - label: "Footer: Copyright"
-            name: footer.copyright
-            widget: string
+              - { label: Checklist, name: checklist, widget: list }
+              - { label: CTA Button Text, name: ctaText, widget: string }
+              - { label: Demo Link Text, name: demoText, widget: string }
+          - label: Shift Section
+            name: shift
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: string }
+              - { label: Intro, name: intro, widget: string }
+              - { label: Quote 1, name: quote1, widget: string }
+              - { label: Bridge, name: bridge, widget: string }
+              - { label: Quote 2, name: quote2, widget: string }
+              - { label: Closing, name: closing, widget: text }
+          - label: Final CTA
+            name: finalCta
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: string }
+              - { label: Lead, name: lead, widget: string }
+              - { label: Button Text, name: buttonText, widget: string }
+          - label: Footer
+            name: footer
+            widget: object
+            fields:
+              - { label: Copyright, name: copyright, widget: string }
 `;
 }
 
